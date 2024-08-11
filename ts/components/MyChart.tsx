@@ -5,7 +5,12 @@ import { Chart } from 'react-charts'
 import { useTheme } from 'next-themes'
 
 import { metricClient } from '@/components/client/metrics'
-import { FullMetricsRequest, IncrementalMetricsRequest } from '@/components/api/api_pb'
+import {
+  FullMetricsRequest,
+  IncrementalMetricsRequest,
+  IncrementalMetricsStreamResponse,
+} from '@/components/api/api_pb'
+import { ClientReadableStream } from 'grpc-web'
 
 const mockData: () => { label: string; data: { secondary: number; radius: number; primary: Date }[] }[] = () => {
   let startDate = new Date()
@@ -106,16 +111,18 @@ export default function MyChart() {
 
   useEffect(() => {
     const req = new FullMetricsRequest().setPerfid('abc')
+    let stream: ClientReadableStream<IncrementalMetricsStreamResponse> | undefined
 
     // metricServerClient.fullMetrics(req).then(r => console.debug('fullMetricsResponse', r.getTodo()))
-    metricClient.fullMetrics(req, {}, function (err, response) {
+    let fullMetricsRsp = metricClient.fullMetrics(req, {}, function (err, response) {
       if (err) {
         console.error(err.code)
         console.error(err.message)
       } else {
         console.log('full resp:', response.getTodo())
         const req = new IncrementalMetricsRequest().setPerfid('abc')
-        const stream = metricClient.incrementalMetrics(req)
+
+        stream = metricClient.incrementalMetrics(req)
 
         stream.on('data', function (message) {
           console.log('stream received data', message.getTodo())
@@ -128,6 +135,12 @@ export default function MyChart() {
         stream.on('end', function () {})
       }
     })
+
+    return () => {
+      fullMetricsRsp.cancel()
+      stream?.cancel()
+      console.log('stream cancelled')
+    }
   }, [])
 
   return (
@@ -150,8 +163,9 @@ export default function MyChart() {
               secondaryAxes: [
                 {
                   getValue: datum => datum.secondary,
-                  showDatumElements: true,
+                  showDatumElements: false,
                   show: true,
+                  stacked: true,
                 },
               ],
               memoizeSeries: false,

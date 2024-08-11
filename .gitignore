@@ -3,3 +3,4 @@
 go/api/*
 go/live-pprof
 ts/components/api/*
+node_modules
