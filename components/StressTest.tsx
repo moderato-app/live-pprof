@@ -2,39 +2,23 @@
 
 import React from 'react'
 import { AxisOptions, Chart } from 'react-charts'
-import ResizableBox from '@/components/ResizableBox'
-import useDemoConfig from './useDemoConfig'
+
+import useDemoConfig from '@/components/useDemoConfig'
 
 export default function StressTest() {
   const [
-    {
-      chartCount,
-      seriesCount,
-      datumCount,
-      activeSeriesIndex,
-      liveData,
-      liveDataInterval,
-      showPoints,
-      memoizeSeries,
-      height,
-      showAxes,
-    },
+    { datumCount, activeSeriesIndex, liveData, showPoints, memoizeSeries },
     setState,
   ] = React.useState({
     activeSeriesIndex: -1,
-    chartCount: 3,
-    seriesCount: 5,
     datumCount: 50,
     liveData: false,
-    liveDataInterval: 1000,
     showPoints: true,
     memoizeSeries: false,
-    height: 100,
-    showAxes: true,
   })
 
   const { data, randomizeData } = useDemoConfig({
-    series: seriesCount,
+    series: 5,
     datums: datumCount,
     dataType: 'time',
   })
@@ -47,9 +31,9 @@ export default function StressTest() {
   >(
     () => ({
       getValue: datum => datum.primary as unknown as Date,
-      show: showAxes,
+      show: true,
     }),
-    [showAxes]
+    [true]
   )
 
   const secondaryAxes = React.useMemo<
@@ -59,176 +43,72 @@ export default function StressTest() {
       {
         getValue: datum => datum.secondary,
         showDatumElements: showPoints,
-        show: showAxes,
+        show: true,
       },
     ],
-    [showAxes, showPoints]
+    [showPoints]
   )
 
-  React.useEffect(() => {
-    let interval: ReturnType<typeof setTimeout>
-
-    if (liveData) {
-      interval = setInterval(() => {
-        randomizeData()
-      }, liveDataInterval)
-    }
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [liveData, liveDataInterval, randomizeData])
-
   return (
-    <>
-      <h3>
-        {chartCount} Charts * 10 Series * 20 Datums (
-        {chartCount * seriesCount * datumCount} data elements) w/ Synced Cursors
-        & Series Highlighting
-      </h3>
-      <br />
-
-      <p>
-        NOTE: This example is best viewed in production for maximum performance.
-      </p>
-
-      <br />
-      <br />
-      <label>
-        Chart Count:{' '}
-        <input
-          type="number"
-          min="1"
-          value={chartCount}
-          onChange={e => {
-            e.persist()
-            setState(old => ({
-              ...old,
-              chartCount: parseInt(e.target.value),
-            }))
-          }}
-        />
-      </label>
-      <br />
-      <label>
-        Series Count:{' '}
-        <input
-          type="number"
-          min="1"
-          value={seriesCount}
-          onChange={e => {
-            e.persist()
-            setState(old => ({
-              ...old,
-              seriesCount: parseInt(e.target.value),
-            }))
-          }}
-        />
-      </label>
-      <br />
-      <label>
-        DatumCount Count:{' '}
-        <input
-          type="number"
-          min="1"
-          value={datumCount}
-          onChange={e => {
-            e.persist()
-            setState(old => ({
-              ...old,
-              datumCount: parseInt(e.target.value),
-            }))
-          }}
-        />
-      </label>
-      <br />
-      <label>
-        Show Points:{' '}
-        <input
-          type="checkbox"
-          checked={showPoints}
-          onChange={e => {
-            e.persist()
-            setState(old => ({ ...old, showPoints: !!e.target.checked }))
-          }}
-        />
-      </label>
-      <label>
-        Show Axes:{' '}
-        <input
-          type="checkbox"
-          checked={showAxes}
-          onChange={e => {
-            e.persist()
-            setState(old => ({ ...old, showAxes: !!e.target.checked }))
-          }}
-        />
-      </label>
-      <br />
-      <label>
-        Memoize Series:{' '}
-        <input
-          type="checkbox"
-          checked={memoizeSeries}
-          onChange={e => {
-            e.persist()
-            setState(old => ({ ...old, memoizeSeries: !!e.target.checked }))
-          }}
-        />
-      </label>
-      <br />
-      <label>
-        Live Data:{' '}
-        <input
-          type="checkbox"
-          checked={liveData}
-          onChange={e => {
-            e.persist()
-            setState(old => ({ ...old, liveData: !!e.target.checked }))
-          }}
-        />
-      </label>
-      <br />
-      <label>
-        Live Data Update Interval:{' '}
-        <select
-          value={String(liveDataInterval)}
-          onChange={e => {
-            e.persist()
-            setState(old => ({
-              ...old,
-              liveDataInterval: parseInt(e.target.value),
-            }))
-          }}
-        >
-          <option value="16">16 ms</option>
-          <option value="32">32 ms</option>
-          <option value="50">50 ms</option>
-          <option value="100">100 ms</option>
-          <option value="250">250 ms</option>
-          <option value="500">500 ms</option>
-          <option value="1000">1000 ms</option>
-        </select>
-      </label>
-      <br />
-      <label>
-        Chart Height
-        <input
-          type="number"
-          value={height}
-          onChange={e => {
-            setState(old => ({ ...old, height: parseInt(e.target.value) }))
-          }}
-        />
-      </label>
-      <button onClick={randomizeData}>Randomize Data</button>
-      <br />
-      <br />
-      {[...new Array(chartCount)].map((d, i) => (
-        <ResizableBox key={i} height={height}>
+    <div className={'flex-col gap-2 w-full justify-center items-center h-full'}>
+      <div className={'flex gap-2'}>
+        <label>
+          DatumCount Count:{' '}
+          <input
+            min="1"
+            type="number"
+            value={datumCount}
+            onChange={e => {
+              e.persist()
+              setState(old => ({
+                ...old,
+                datumCount: parseInt(e.target.value),
+              }))
+            }}
+          />
+        </label>
+        <label>
+          Show Points:{' '}
+          <input
+            checked={showPoints}
+            type="checkbox"
+            onChange={e => {
+              e.persist()
+              setState(old => ({ ...old, showPoints: !!e.target.checked }))
+            }}
+          />
+        </label>
+        <label>
+          Memoize Series:{' '}
+          <input
+            checked={memoizeSeries}
+            type="checkbox"
+            onChange={e => {
+              e.persist()
+              setState(old => ({ ...old, memoizeSeries: !!e.target.checked }))
+            }}
+          />
+        </label>
+        <label>
+          Live Data:{' '}
+          <input
+            checked={liveData}
+            type="checkbox"
+            onChange={e => {
+              e.persist()
+              setState(old => ({ ...old, liveData: !!e.target.checked }))
+            }}
+          />
+        </label>
+        <button onClick={randomizeData}>Randomize Data</button>
+      </div>
+      {[...new Array(2)].map((d, i) => (
+        <div key={i} className="w-full h-[50%]">
           <Chart
+            key={i}
             options={{
               data,
+              padding: { left: 10, top: 10, right: 10, bottom: 10 },
               primaryAxis,
               secondaryAxes,
               memoizeSeries,
@@ -260,8 +140,8 @@ export default function StressTest() {
               },
             }}
           />
-        </ResizableBox>
+        </div>
       ))}
-    </>
+    </div>
   )
 }
