@@ -1,7 +1,5 @@
 import React from 'react'
 
-//
-
 const options = {
   elementType: ['line', 'area', 'bar'],
   primaryAxisType: ['linear', 'time', 'log', 'band'],
@@ -148,15 +146,12 @@ export default function useChartConfig({
           onChange={({ target: { value } }) =>
             setState(old => ({
               ...old,
-              [option]:
-                typeof options[option][0] === 'boolean'
-                  ? value === 'true'
-                  : value,
+              [option]: typeof options[option][0] === 'boolean' ? value === 'true' : value,
             }))
           }
         >
           {options[option].map((d: any) => (
-            <option value={d as string} key={d.toString()}>
+            <option key={d.toString()} value={d as string}>
               {d.toString()}
             </option>
           ))}
@@ -172,25 +167,16 @@ export default function useChartConfig({
   }
 }
 
-function makeDataFrom(
-  dataType: DataType,
-  series: number,
-  datums: number,
-  useR?: boolean
-) {
-  return [
-    ...new Array(series || Math.max(Math.round(Math.random() * 5), 1)),
-  ].map((d, i) => makeSeries(i, dataType, datums, useR))
+function makeDataFrom(dataType: DataType, series: number, datums: number, useR?: boolean) {
+  return [...new Array(series || Math.max(Math.round(Math.random() * 5), 1))].map((d, i) =>
+    makeSeries(i, dataType, datums, useR)
+  )
 }
 
-function makeSeries(
-  i: number,
-  dataType: DataType,
-  datums: number,
-  useR?: boolean
-) {
+function makeSeries(i: number, dataType: DataType, datums: number, useR?: boolean) {
   const start = 0
   const startDate = new Date()
+
   // startDate.setFullYear(2020);
   startDate.setUTCHours(0)
   startDate.setUTCMinutes(0)
@@ -203,6 +189,7 @@ function makeSeries(
   const rMin = 2
   const rMax = 20
   const nullChance = 0
+
   return {
     label: `Series ${i + 1}`,
     data: [...new Array(length)].map((_, i) => {
@@ -213,28 +200,18 @@ function makeSeries(
       } else if (dataType === 'time') {
         x = new Date(startDate.getTime() + 60 * 1000 * 60 * 24 * i)
       } else if (dataType === 'linear') {
-        x =
-          Math.random() < nullChance
-            ? null
-            : min + Math.round(Math.random() * (max - min))
+        x = Math.random() < nullChance ? null : min + Math.round(Math.random() * (max - min))
       } else {
         x = start + i
       }
 
       const distribution = 1.1
 
-      const y =
-        Math.random() < nullChance
-          ? null
-          : min + Math.round(Math.random() * (max - min))
+      const y = Math.random() < nullChance ? null : min + Math.round(Math.random() * (max - min))
 
       const r = !useR
         ? undefined
-        : rMax -
-          Math.floor(
-            Math.log(Math.random() * (distribution ** rMax - rMin) + rMin) /
-              Math.log(distribution)
-          )
+        : rMax - Math.floor(Math.log(Math.random() * (distribution ** rMax - rMin) + rMin) / Math.log(distribution))
 
       return {
         primary: x,
