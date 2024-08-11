@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import React from "react";
-import { AxisOptions, Chart } from "react-charts";
-import ResizableBox from "@/components/ResizableBox";
-import useDemoConfig from "./useDemoConfig";
+import React from 'react'
+import { AxisOptions, Chart } from 'react-charts'
+import ResizableBox from '@/components/ResizableBox'
+import useDemoConfig from './useDemoConfig'
 
 export default function StressTest() {
   const [
@@ -31,53 +31,53 @@ export default function StressTest() {
     memoizeSeries: false,
     height: 100,
     showAxes: true,
-  });
+  })
 
   const { data, randomizeData } = useDemoConfig({
     series: seriesCount,
     datums: datumCount,
-    dataType: "time",
-  });
+    dataType: 'time',
+  })
 
-  const [primaryCursorValue, setPrimaryCursorValue] = React.useState();
-  const [secondaryCursorValue, setSecondaryCursorValue] = React.useState();
+  const [primaryCursorValue, setPrimaryCursorValue] = React.useState()
+  const [secondaryCursorValue, setSecondaryCursorValue] = React.useState()
 
   const primaryAxis = React.useMemo<
-    AxisOptions<typeof data[number]["data"][number]>
+    AxisOptions<(typeof data)[number]['data'][number]>
   >(
     () => ({
-      getValue: (datum) => datum.primary as unknown as Date,
+      getValue: datum => datum.primary as unknown as Date,
       show: showAxes,
     }),
     [showAxes]
-  );
+  )
 
   const secondaryAxes = React.useMemo<
-    AxisOptions<typeof data[number]["data"][number]>[]
+    AxisOptions<(typeof data)[number]['data'][number]>[]
   >(
     () => [
       {
-        getValue: (datum) => datum.secondary,
+        getValue: datum => datum.secondary,
         showDatumElements: showPoints,
         show: showAxes,
       },
     ],
     [showAxes, showPoints]
-  );
+  )
 
   React.useEffect(() => {
-    let interval: ReturnType<typeof setTimeout>;
+    let interval: ReturnType<typeof setTimeout>
 
     if (liveData) {
       interval = setInterval(() => {
-        randomizeData();
-      }, liveDataInterval);
+        randomizeData()
+      }, liveDataInterval)
     }
 
     return () => {
-      clearInterval(interval);
-    };
-  }, [liveData, liveDataInterval, randomizeData]);
+      clearInterval(interval)
+    }
+  }, [liveData, liveDataInterval, randomizeData])
 
   return (
     <>
@@ -95,110 +95,110 @@ export default function StressTest() {
       <br />
       <br />
       <label>
-        Chart Count:{" "}
+        Chart Count:{' '}
         <input
           type="number"
           min="1"
           value={chartCount}
-          onChange={(e) => {
-            e.persist();
-            setState((old) => ({
+          onChange={e => {
+            e.persist()
+            setState(old => ({
               ...old,
               chartCount: parseInt(e.target.value),
-            }));
+            }))
           }}
         />
       </label>
       <br />
       <label>
-        Series Count:{" "}
+        Series Count:{' '}
         <input
           type="number"
           min="1"
           value={seriesCount}
-          onChange={(e) => {
-            e.persist();
-            setState((old) => ({
+          onChange={e => {
+            e.persist()
+            setState(old => ({
               ...old,
               seriesCount: parseInt(e.target.value),
-            }));
+            }))
           }}
         />
       </label>
       <br />
       <label>
-        DatumCount Count:{" "}
+        DatumCount Count:{' '}
         <input
           type="number"
           min="1"
           value={datumCount}
-          onChange={(e) => {
-            e.persist();
-            setState((old) => ({
+          onChange={e => {
+            e.persist()
+            setState(old => ({
               ...old,
               datumCount: parseInt(e.target.value),
-            }));
+            }))
           }}
         />
       </label>
       <br />
       <label>
-        Show Points:{" "}
+        Show Points:{' '}
         <input
           type="checkbox"
           checked={showPoints}
-          onChange={(e) => {
-            e.persist();
-            setState((old) => ({ ...old, showPoints: !!e.target.checked }));
+          onChange={e => {
+            e.persist()
+            setState(old => ({ ...old, showPoints: !!e.target.checked }))
           }}
         />
       </label>
       <label>
-        Show Axes:{" "}
+        Show Axes:{' '}
         <input
           type="checkbox"
           checked={showAxes}
-          onChange={(e) => {
-            e.persist();
-            setState((old) => ({ ...old, showAxes: !!e.target.checked }));
+          onChange={e => {
+            e.persist()
+            setState(old => ({ ...old, showAxes: !!e.target.checked }))
           }}
         />
       </label>
       <br />
       <label>
-        Memoize Series:{" "}
+        Memoize Series:{' '}
         <input
           type="checkbox"
           checked={memoizeSeries}
-          onChange={(e) => {
-            e.persist();
-            setState((old) => ({ ...old, memoizeSeries: !!e.target.checked }));
+          onChange={e => {
+            e.persist()
+            setState(old => ({ ...old, memoizeSeries: !!e.target.checked }))
           }}
         />
       </label>
       <br />
       <label>
-        Live Data:{" "}
+        Live Data:{' '}
         <input
           type="checkbox"
           checked={liveData}
-          onChange={(e) => {
-            e.persist();
-            setState((old) => ({ ...old, liveData: !!e.target.checked }));
+          onChange={e => {
+            e.persist()
+            setState(old => ({ ...old, liveData: !!e.target.checked }))
           }}
         />
       </label>
       <br />
       <label>
-        Live Data Update Interval:{" "}
+        Live Data Update Interval:{' '}
         <select
           value={String(liveDataInterval)}
-          onChange={(e) => {
-            e.persist();
-            setState((old) => ({
+          onChange={e => {
+            e.persist()
+            setState(old => ({
               ...old,
               liveDataInterval: parseInt(e.target.value),
-            }));
+            }))
           }}
         >
           <option value="16">16 ms</option>
@@ -216,8 +216,8 @@ export default function StressTest() {
         <input
           type="number"
           value={height}
-          onChange={(e) => {
-            setState((old) => ({ ...old, height: parseInt(e.target.value) }));
+          onChange={e => {
+            setState(old => ({ ...old, height: parseInt(e.target.value) }))
           }}
         />
       </label>
@@ -232,7 +232,7 @@ export default function StressTest() {
               primaryAxis,
               secondaryAxes,
               memoizeSeries,
-              getSeriesStyle: (series) => ({
+              getSeriesStyle: series => ({
                 opacity:
                   activeSeriesIndex > -1
                     ? series.index === activeSeriesIndex
@@ -242,26 +242,26 @@ export default function StressTest() {
               }),
               primaryCursor: {
                 value: primaryCursorValue,
-                onChange: (value) => {
-                  setPrimaryCursorValue(value);
+                onChange: value => {
+                  setPrimaryCursorValue(value)
                 },
               },
               secondaryCursor: {
                 value: secondaryCursorValue,
-                onChange: (value) => {
-                  setSecondaryCursorValue(value);
+                onChange: value => {
+                  setSecondaryCursorValue(value)
                 },
               },
-              onFocusDatum: (datum) => {
-                setState((old) => ({
+              onFocusDatum: datum => {
+                setState(old => ({
                   ...old,
-                  activeSeriesIndex: datum ? datum.seriesIndex : -1,
-                }));
+                  activeSeriesIndex: -1,
+                }))
               },
             }}
           />
         </ResizableBox>
       ))}
     </>
-  );
+  )
 }
