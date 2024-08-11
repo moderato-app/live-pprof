@@ -1,8 +1,8 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: 'Next.js + NextUI',
-  description: 'Make beautiful websites regardless of your design experience.',
+  name: 'Live pprof',
+  description: 'Monitor Go processes in real-time, launching in 1 second, not all day',
   navItems: [
     {
       label: 'Home',

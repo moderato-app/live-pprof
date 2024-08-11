@@ -1,9 +1,9 @@
-import StressTest from '@/components/StressTest'
+import MyChart from '@/components/MyChart'
 
 export default function Home() {
   return (
     <section className="h-full">
-      <StressTest />
+      <MyChart />
     </section>
   )
 }
