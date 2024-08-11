@@ -2,4 +2,4 @@
 **/.vscode
 go/api/*
 go/live-pprof
-ts/api/*
+ts/components/api/*

@@ -3,7 +3,7 @@ package server;
 
 option go_package = "github.com/moderato-app/live-pprof/api";
 
-service KV {
+service Metric {
   rpc FullMetrics(FullMetricsRequest) returns (FullMetricsResponse);
 
   rpc IncrementalMetrics(IncrementalMetricsRequest) returns (stream IncrementalMetricsStreamResponse) {
@@ -16,13 +16,13 @@ message FullMetricsRequest {
 
 
 message FullMetricsResponse {
-
+  string todo = 1;
 }
 
 message IncrementalMetricsRequest {
-
+  string perfId = 1;
 }
 
 message IncrementalMetricsStreamResponse {
-
+  string todo = 1;
 }

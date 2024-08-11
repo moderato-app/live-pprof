@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react'
 import { Chart } from 'react-charts'
 import { useTheme } from 'next-themes'
 
+import { metricClient } from '@/components/client/metrics'
+import { FullMetricsRequest, IncrementalMetricsRequest } from '@/components/api/api_pb'
+
 const mockData: () => { label: string; data: { secondary: number; radius: number; primary: Date }[] }[] = () => {
   let startDate = new Date()
 
@@ -91,16 +94,41 @@ export default function MyChart() {
     })
   }, [theme])
 
-  // Chart ignores options.dark and stays 'light' theme on initialization. This callback ensures Chart respects the theme later on.
+  // useEffect(() => {
+  //   const t = setInterval(() => {
+  //     let newData = mockAppendData(data)
+  //
+  //     setData(newData)
+  //   }, 1000)
+  //
+  //   return () => clearTimeout(t)
+  // }, [data])
+
   useEffect(() => {
-    const t = setInterval(() => {
-      let newData = mockAppendData(data)
+    const req = new FullMetricsRequest().setPerfid('abc')
 
-      setData(newData)
-    }, 1000)
+    // metricServerClient.fullMetrics(req).then(r => console.debug('fullMetricsResponse', r.getTodo()))
+    metricClient.fullMetrics(req, {}, function (err, response) {
+      if (err) {
+        console.error(err.code)
+        console.error(err.message)
+      } else {
+        console.log('full resp:', response.getTodo())
+        const req = new IncrementalMetricsRequest().setPerfid('abc')
+        const stream = metricClient.incrementalMetrics(req)
 
-    return () => clearTimeout(t)
-  }, [data])
+        stream.on('data', function (message) {
+          console.log('stream received data', message.getTodo())
+        })
+        stream.on('status', function (status) {
+          console.log(status.code)
+          console.log(status.details)
+          console.log(status.metadata)
+        })
+        stream.on('end', function () {})
+      }
+    })
+  }, [])
 
   return (
     <div className={'flex flex-col justify-around h-full'}>
