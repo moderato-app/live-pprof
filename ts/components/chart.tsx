@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { Chart } from 'react-charts'
 import { useTheme } from 'next-themes'
+import { ClientReadableStream } from 'grpc-web'
+import prettyBytes from 'pretty-bytes'
 
 import { metricClient } from '@/components/client/metrics'
 import {
@@ -10,104 +12,10 @@ import {
   IncrementalMetricsRequest,
   IncrementalMetricsStreamResponse,
 } from '@/components/api/api_pb'
-import { ClientReadableStream } from 'grpc-web'
-
-const mockData: () => { label: string; data: { secondary: number; radius: number; primary: Date }[] }[] = () => {
-  let startDate = new Date()
-
-  startDate.setUTCHours(0)
-  startDate.setUTCMinutes(0)
-  startDate.setUTCSeconds(0)
-  startDate.setUTCMilliseconds(0)
-
-  return [...new Array(5)].map((_, lineNumber) => {
-    const dataArray = [...new Array(50)].map((_, i) => {
-      const x = new Date(startDate.getTime() + 1000 * i)
-      const y = Math.random() * 500
-
-      return {
-        primary: x,
-        secondary: y,
-        radius: 0,
-      }
-    })
-
-    return {
-      label: `Line ${lineNumber}`,
-      data: dataArray,
-    }
-  })
-}
-
-function mockAppendData(
-  old: {
-    label: string
-    data: {
-      secondary: number
-      radius: number
-      primary: Date
-    }[]
-  }[]
-) {
-  // get latest date
-  const date = old
-    .map(it => it.data[it.data.length - 1].primary)
-    .sort()
-    .reverse()[0]
-
-  return old.map(line => {
-    let last = line.data.findLast(_ => true)!
-
-    const newDate = new Date(date.getTime() + 1000)
-    const y = last.secondary + Math.random() * 40 - 20
-
-    if (Math.random() < 0.5) {
-      return {
-        label: line.label,
-        data: [
-          ...line.data,
-          {
-            secondary: y,
-            radius: 0,
-            primary: newDate,
-          },
-        ],
-      }
-    } else {
-      return {
-        label: line.label,
-        data: line.data,
-      }
-    }
-  })
-}
+import { appendData, initLines, Line } from '@/components/chat-data'
 
 export default function MyChart() {
-  const theme = useTheme()
-
-  const [data, setData] = useState(mockData())
-
-  const [primaryCursorValue, setPrimaryCursorValue] = React.useState()
-  const [secondaryCursorValue, setSecondaryCursorValue] = React.useState()
-
-  const [isDark, setIsDark] = useState(false)
-
-  // Chart ignores options.dark and stays 'light' theme on initialization. This callback ensures Chart respects the theme later on.
-  useEffect(() => {
-    setTimeout(() => {
-      setIsDark(theme.resolvedTheme == 'dark')
-    })
-  }, [theme])
-
-  // useEffect(() => {
-  //   const t = setInterval(() => {
-  //     let newData = mockAppendData(data)
-  //
-  //     setData(newData)
-  //   }, 1000)
-  //
-  //   return () => clearTimeout(t)
-  // }, [data])
+  const [lines, setLines] = useState<Line[]>(initLines)
 
   useEffect(() => {
     const req = new FullMetricsRequest().setPerfid('abc')
@@ -125,7 +33,11 @@ export default function MyChart() {
         stream = metricClient.incrementalMetrics(req)
 
         stream.on('data', function (message) {
-          console.log('stream received data', message.getTodo())
+          console.log('stream received data', message)
+
+          setLines(prevData => {
+            return appendData(prevData, message)
+          })
         })
         stream.on('status', function (status) {
           console.log(status.code)
@@ -143,6 +55,28 @@ export default function MyChart() {
     }
   }, [])
 
+  return <div className={'flex flex-col justify-around h-full'}>{lines ? <Charts lines={lines} /> : null}</div>
+}
+
+interface Props {
+  lines: Line[]
+}
+
+export const Charts: React.FC<Props> = ({ lines }) => {
+  const theme = useTheme()
+
+  const [primaryCursorValue, setPrimaryCursorValue] = React.useState()
+  const [secondaryCursorValue, setSecondaryCursorValue] = React.useState()
+
+  const [isDark, setIsDark] = useState(false)
+
+  // Chart ignores options.dark and stays 'light' theme on initialization. This callback ensures Chart respects the theme later on.
+  useEffect(() => {
+    setTimeout(() => {
+      setIsDark(theme.resolvedTheme == 'dark')
+    })
+  }, [theme])
+
   return (
     <div className={'flex flex-col justify-around h-full'}>
       {[...new Array(2)].map((_, i) => (
@@ -150,7 +84,7 @@ export default function MyChart() {
           <Chart
             key={i}
             options={{
-              data: data,
+              data: lines,
               // to avoid visual clutter
               initialWidth: 0,
               initialHeight: 0,
@@ -162,10 +96,12 @@ export default function MyChart() {
               },
               secondaryAxes: [
                 {
-                  getValue: datum => datum.secondary,
-                  showDatumElements: false,
+                  getValue: datum => datum.secondary as number,
+                  formatters: {
+                    scale: (value?: number) => `${prettyBytes(value ?? 0)}`,
+                  },
+                  showDatumElements: true,
                   show: true,
-                  stacked: true,
                 },
               ],
               memoizeSeries: false,

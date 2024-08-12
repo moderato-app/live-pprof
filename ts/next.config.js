@@ -1,6 +1,7 @@
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 const nextConfig = {}
+const withTM = require('next-transpile-modules')(['echarts', 'zrender'])
 
-module.exports = {
-    output: "export"
-}
+module.exports = withTM({
+  output: 'export',
+})
