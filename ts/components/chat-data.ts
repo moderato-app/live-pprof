@@ -36,8 +36,10 @@ export function appendData(lines: Line[], rsp: IncrementalMetricsStreamResponse)
   let grp = lo.keyBy(lines, line => line.label)
 
   let newLines: Line[] = []
-  let items = lo.sortBy(rsp.getItemsList(), item => item.getFlat()).reverse()
-  .slice(0, 6)
+  let items = lo
+    .sortBy(rsp.getItemsList(), item => item.getFlat())
+    .reverse()
+    .slice(0, 6)
 
   let date = convertUnixNanoToDate(rsp.getDate())
 

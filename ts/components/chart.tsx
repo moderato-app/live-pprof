@@ -33,16 +33,16 @@ export default function MyChart() {
         stream = metricClient.incrementalMetrics(req)
 
         stream.on('data', function (message) {
-          console.log('stream received data', message)
+          console.debug('stream received data', message)
 
           setLines(prevData => {
             return appendData(prevData, message)
           })
         })
         stream.on('status', function (status) {
-          console.log(status.code)
-          console.log(status.details)
-          console.log(status.metadata)
+          console.debug(status.code)
+          console.debug(status.details)
+          console.debug(status.metadata)
         })
         stream.on('end', function () {})
       }

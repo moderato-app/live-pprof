@@ -57,6 +57,7 @@ let option: EChartsOption = {
   },
   series: [
     {
+      showSymbol: false,
       type: 'line',
       data: data.valueData,
       // Set `large` for large data amount
