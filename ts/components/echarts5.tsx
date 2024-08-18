@@ -18,6 +18,7 @@ import {
 } from '@/components/api/api_pb'
 import { metricClient } from '@/components/client/metrics'
 import { convertUnixNanoToDate } from '@/components/util/util'
+import _ from 'lodash'
 
 type Point = {
   date: Date
@@ -82,7 +83,7 @@ export const MyEcharts5: React.FC = () => {
   const [graphData, setGraphData] = useState<GraphData>({ lineTable: {}, dates: [] })
   const [total, setTotal] = useState(false)
   const [line, setLine] = useState(false)
-  const [smooth, setSmooth] = useState(true)
+  const [smooth, setSmooth] = useState(false)
 
   useEffect(() => {
     if (ref.current) {
@@ -139,15 +140,15 @@ export const MyEcharts5: React.FC = () => {
         option={run(graphData, theme.resolvedTheme == 'dark', total, smooth, line)}
         theme={theme.resolvedTheme == 'dark' ? 'dark' : ''}
       />
-      <CheckboxGroup defaultValue={['Smooth']} label="Graph options">
+      <CheckboxGroup defaultValue={[]} label="Graph options">
         <Checkbox isSelected={total} size="sm" value="Total" onValueChange={setTotal}>
           Total
         </Checkbox>
-        <Checkbox isSelected={smooth} size="sm" value="Smooth" onValueChange={setSmooth}>
-          Smooth
-        </Checkbox>
         <Checkbox className="whitespace-nowrap" isSelected={line} size="sm" value="Line" onValueChange={setLine}>
           Line of Code
+        </Checkbox>
+        <Checkbox isSelected={smooth} size="sm" value="Smooth" onValueChange={setSmooth}>
+          Smooth
         </Checkbox>
       </CheckboxGroup>
 
@@ -224,10 +225,14 @@ function run(graphData: GraphData, isDark: boolean, total: boolean, smooth: bool
       order: 'valueDesc',
       trigger: 'axis',
       enterable: true,
+      triggerOn: 'mousemove|click',
       // https://github.com/apache/echarts/issues/9763#issuecomment-1446643093
       // remove items that have null flat value
       formatter: function (params: any[]) {
-        let output = ` <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` + '<br/>'
+        params = _.uniqBy(params, p => p.seriesId)
+        let output =
+          ` <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` +
+          '<br/>'
 
         output += '<div class="w-full cursor-pointer select-text">'
 
@@ -236,12 +241,13 @@ function run(graphData: GraphData, isDark: boolean, total: boolean, smooth: bool
           const splits = p.seriesName.split(' ')
           const func = splits[0]
           const line = splits[1]
-          const lineHtml = showLine
-            ? `<div class="flex items-center">
+          const lineHtml =
+            showLine && p.seriesName != 'total '
+              ? `<div class="flex items-center">
                   <div class="opacity-0">${p.marker}</div>
                   <span class="text-default-500">${line}</span>
                 </div>`
-            : ''
+              : ''
           if (value) {
             output += `<div class="flex flex-col gap-0.5">
               <div class="flex flex-col">
