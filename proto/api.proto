@@ -4,26 +4,15 @@ package server;
 option go_package = "github.com/moderato-app/live-pprof/api";
 
 service Metric {
-  rpc FullMetrics(FullMetricsRequest) returns (FullMetricsResponse);
-
-  rpc IncrementalMetrics(IncrementalMetricsRequest) returns (stream IncrementalMetricsStreamResponse) {
-  }
+  rpc InuseSpaceMetrics(GoMetricsRequest) returns (GoMetricsResponse);
+  rpc CPUMetrics(GoMetricsRequest) returns (GoMetricsResponse);
 }
 
-message FullMetricsRequest {
-  string perfId = 1;
+message GoMetricsRequest {
+  string url = 1;
 }
 
-
-message FullMetricsResponse {
-  string todo = 1;
-}
-
-message IncrementalMetricsRequest {
-  string perfId = 1;
-}
-
-message IncrementalMetricsStreamResponse {
+message GoMetricsResponse {
   int64 date = 1;
   repeated Item items = 2;
   int64  total = 3;

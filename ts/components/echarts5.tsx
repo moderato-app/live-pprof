@@ -5,21 +5,17 @@ import { DatasetComponentOption } from 'echarts/components'
 import '@/components/dark.js'
 import { connect, SeriesOption } from 'echarts'
 import { useTheme } from 'next-themes'
-import { ClientReadableStream } from 'grpc-web'
 import prettyBytes from 'pretty-bytes'
 import { Checkbox } from '@nextui-org/checkbox'
 import _ from 'lodash'
 import { useAtom } from 'jotai'
+import grpcWeb from 'grpc-web'
 
-import {
-  FullMetricsRequest,
-  IncrementalMetricsRequest,
-  IncrementalMetricsStreamResponse,
-  Item,
-} from '@/components/api/api_pb'
+import { GoMetricsRequest, GoMetricsResponse, Item } from '@/components/api/api_pb'
 import { metricClient } from '@/components/client/metrics'
 import { convertUnixNanoToDate } from '@/components/util/util'
 import { freezeTooltipAtom, inuseSpacePrefAtom, showTooltipAtom } from '@/components/atom/shared-atom'
+import * as api_pb from '@/components/api/api_pb'
 
 type Point = {
   date: Date
@@ -41,7 +37,7 @@ export type GraphData = {
 
 const getKey = (item: Item): string => item.getFunc() + ' ' + item.getLine()
 
-export function appendGraphData(graphData: GraphData, rsp: IncrementalMetricsStreamResponse): GraphData {
+export function appendGraphData(graphData: GraphData, rsp: GoMetricsResponse): GraphData {
   let date = convertUnixNanoToDate(rsp.getDate())
 
   let items = rsp.getItemsList().filter(item => item.getFlat() > 0)
@@ -98,40 +94,35 @@ export const MyEcharts5: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    const req = new FullMetricsRequest().setPerfid('abc')
-    let stream: ClientReadableStream<IncrementalMetricsStreamResponse> | undefined
+    const req = new GoMetricsRequest().setUrl('http://localhost:2379/debug/pprof')
+    const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
+    const t = setInterval(() => {
+      let stream = metricClient.inuseSpaceMetrics(req, null, (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
+        // remove stream from the list
+        const index = streams.indexOf(stream)
+        if (index > -1) {
+          streams.splice(index, 1)
+        }
 
-    // metricServerClient.fullMetrics(req).then(r => console.debug('fullMetricsResponse', r.getTodo()))
-    let fullMetricsRsp = metricClient.fullMetrics(req, {}, function (err, response) {
-      if (err) {
-        console.error(err.code)
-        console.error(err.message)
-      } else {
-        console.log('full resp:', response.getTodo())
-        const req = new IncrementalMetricsRequest().setPerfid('abc')
-
-        stream = metricClient.incrementalMetrics(req)
-
-        stream.on('data', function (message) {
-          console.debug('stream received data', message)
-
+        if (err) {
+          console.log('inuseSpaceMetrics err', err)
+        } else {
+          console.log('inuseSpaceMetrics resp', response)
           setGraphData(prevData => {
-            return appendGraphData(prevData, message)
+            return appendGraphData(prevData, response)
           })
-        })
-        stream.on('status', function (status) {
-          console.log(status.code)
-          console.log(status.details)
-          console.log(status.metadata)
-        })
-        stream.on('end', function () {})
-      }
-    })
+        }
+      })
+      streams.push(stream)
+    }, 1000)
+
+    if (streams.length > 5) {
+      console.warn('too many concurrent streams. consider set a timeout for each stream')
+    }
 
     return () => {
-      fullMetricsRsp.cancel()
-      stream?.cancel()
-      console.log('stream cancelled')
+      clearTimeout(t)
+      streams.forEach(p => p.cancel())
     }
   }, [])
 
