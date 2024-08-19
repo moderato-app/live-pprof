@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { DatasetComponentOption } from 'echarts/components'
-import '@/components/dark.js'
+// import '@/components/charts/dark.js'
 import { connect, SeriesOption } from 'echarts'
 import { useTheme } from 'next-themes'
 import prettyBytes from 'pretty-bytes'
@@ -10,12 +10,16 @@ import { Checkbox } from '@nextui-org/checkbox'
 import _ from 'lodash'
 import { useAtom } from 'jotai'
 import grpcWeb from 'grpc-web'
+import { registerTheme } from 'echarts'
 
 import { GoMetricsRequest, GoMetricsResponse, Item } from '@/components/api/api_pb'
 import { metricClient } from '@/components/client/metrics'
 import { convertUnixNanoToDate } from '@/components/util/util'
 import { freezeTooltipAtom, inuseSpacePrefAtom, showTooltipAtom } from '@/components/atom/shared-atom'
 import * as api_pb from '@/components/api/api_pb'
+import darkTheme from '@/components/charts/dark-theme'
+
+registerTheme('dark', darkTheme())
 
 type Point = {
   date: Date
@@ -147,7 +151,7 @@ export const MyEcharts5: React.FC = () => {
       >
         {/*@ts-ignore*/}
         <ReactECharts
-          key={inuseSpacePref.total}
+          key={`${inuseSpacePref.total}`}
           // key={`${total}+${showTooltip}`}
           className="w-full"
           option={run(
@@ -308,7 +312,7 @@ function run(
             return output + '</div>'
           },
 
-          valueFormatter: function (value: number | string, dataIndex: number): string | undefined {
+          valueFormatter: function (value: number | string, _dataIndex: number): string | undefined {
             if (typeof value === 'number' && value) {
               return prettyBytes(value as number)
             } else {

@@ -1,11 +1,10 @@
 {
-  "name": "next-app-template",
+  "name": "live-pprof",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
-    "start": "next start",
     "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
   },
   "dependencies": {
@@ -20,23 +19,23 @@
     "@nextui-org/snippet": "2.0.41",
     "@nextui-org/switch": "2.0.33",
     "@nextui-org/system": "2.2.5",
-    "@nextui-org/theme": "2.2.9",
     "@react-aria/ssr": "3.9.4",
     "@react-aria/visually-hidden": "3.8.12",
-    "@siemens/ix-echarts": "^2.2.0",
     "clsx": "2.1.1",
     "framer-motion": "~11.1.1",
     "google-protobuf": "^3.21.4",
     "grpc-web": "^1.5.0",
-    "intl-messageformat": "^10.5.0",
     "lodash": "^4.17.21",
     "next": "14.2.4",
     "next-themes": "^0.2.1",
     "pretty-bytes": "^6.1.1",
     "react": "18.3.1",
-    "react-charts": "3.0.0-beta.57",
     "react-dom": "18.3.1",
-    "react-resizable": "^3.0.5"
+    "@nextui-org/dropdown": "^2.1.29",
+    "@nextui-org/theme": "^2.2.9",
+    "dayjs": "^1.11.12",
+    "echarts-for-react": "^3.0.2",
+    "jotai": "^2.9.3"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",
