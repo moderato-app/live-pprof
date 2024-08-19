@@ -2,83 +2,25 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { DatasetComponentOption } from 'echarts/components'
-// import '@/components/charts/dark.js'
-import { connect, SeriesOption } from 'echarts'
+import { connect, registerTheme, SeriesOption } from 'echarts'
 import { useTheme } from 'next-themes'
 import prettyBytes from 'pretty-bytes'
 import { Checkbox } from '@nextui-org/checkbox'
 import _ from 'lodash'
 import { useAtom } from 'jotai'
 import grpcWeb from 'grpc-web'
-import { registerTheme } from 'echarts'
 
-import { GoMetricsRequest, GoMetricsResponse, Item } from '@/components/api/api_pb'
-import { metricClient } from '@/components/client/metrics'
-import { convertUnixNanoToDate } from '@/components/util/util'
-import { freezeTooltipAtom, inuseSpacePrefAtom, showTooltipAtom } from '@/components/atom/shared-atom'
 import * as api_pb from '@/components/api/api_pb'
+import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
+import { metricClient } from '@/components/client/metrics'
+import { freezeTooltipAtom, inuseSpacePrefAtom, showTooltipAtom } from '@/components/atom/shared-atom'
 import darkTheme from '@/components/charts/dark-theme'
+import { GraphData } from '@/components/charts/data-structure'
+import { appendGraphData } from '@/components/charts/data-operation'
 
 registerTheme('dark', darkTheme())
 
-type Point = {
-  date: Date
-  flat: number | undefined
-  cum: number | undefined
-}
-
-type Line = {
-  name: string
-  points: Point[]
-}
-
-export type LineTable = Record<string, Line>
-
-export type GraphData = {
-  lineTable: LineTable
-  dates: Date[]
-}
-
-const getKey = (item: Item): string => item.getFunc() + ' ' + item.getLine()
-
-export function appendGraphData(graphData: GraphData, rsp: GoMetricsResponse): GraphData {
-  let date = convertUnixNanoToDate(rsp.getDate())
-
-  let items = rsp.getItemsList().filter(item => item.getFlat() > 0)
-
-  graphData.dates.push(date)
-  for (let key in graphData.lineTable) {
-    graphData.lineTable[key].points.push({
-      date: date,
-      flat: undefined,
-      cum: undefined,
-    })
-  }
-
-  for (let item of items) {
-    const key = getKey(item)
-    let line = graphData.lineTable[key]
-    if (!line) {
-      const nullPoints = graphData.dates.map(
-        (d): Point => ({
-          date: d,
-          flat: undefined,
-          cum: undefined,
-        })
-      )
-      line = {
-        name: key,
-        points: nullPoints,
-      }
-      graphData.lineTable[key] = line
-    }
-    const last = line.points[line.points.length - 1]
-    line.points[line.points.length - 1] = { ...last, flat: item.getFlat(), cum: item.getCum() }
-  }
-  return { ...graphData }
-}
-
-export const MyEcharts5: React.FC = () => {
+export const MyEcharts: React.FC = () => {
   const theme = useTheme()
   const ref = useRef<any>()
   const [graphData, setGraphData] = useState<GraphData>({ lineTable: {}, dates: [] })
@@ -183,32 +125,7 @@ export const MyEcharts5: React.FC = () => {
           </Checkbox>
         </div>
 
-        <div className="flex gap-3">
-          {/*<Switch isSelected={total} size="sm" onValueChange={setTotal}>*/}
-          {/*  Total*/}
-          {/*</Switch>*/}
-          {/*<Switch isSelected={line} size="sm" onValueChange={setLine}>*/}
-          {/*  Line*/}
-          {/*</Switch>*/}
-          {/*<Switch isSelected={smooth} size="sm" onValueChange={setSmooth}>*/}
-          {/*  Smooth*/}
-          {/*</Switch>*/}
-
-          {/*<Dropdown>*/}
-          {/*  <DropdownTrigger>*/}
-          {/*    <Button size={'sm'} variant="light">*/}
-          {/*      ...*/}
-          {/*    </Button>*/}
-          {/*  </DropdownTrigger>*/}
-          {/*  <DropdownMenu aria-label="Static Actions">*/}
-          {/*    <DropdownItem key="smotth">*/}
-          {/*      <Switch isSelected={smooth} size="sm" onValueChange={setSmooth}>*/}
-          {/*        Smooth*/}
-          {/*      </Switch>*/}
-          {/*    </DropdownItem>*/}
-          {/*  </DropdownMenu>*/}
-          {/*</Dropdown>*/}
-        </div>
+        <div className="flex gap-3"></div>
       </div>
     </section>
   )
@@ -250,6 +167,7 @@ function run(
       },
     }))
 
+  // noinspection JSUnusedGlobalSymbols
   return {
     animationDuration: 100,
     // legend: {
@@ -326,7 +244,13 @@ function run(
                 color: '#e3e3e3',
               }
             : null,
-          position: function (point: Array<number>, params: any | Array<any>, dom: HTMLElement, rect: any, size: any) {
+          position: function (
+            point: Array<number>,
+            _params: any | Array<any>,
+            dom: HTMLElement,
+            _rect: any,
+            size: any
+          ) {
             if (point[0] + dom.clientWidth + 20 < size.viewSize[0]) {
               // place tooltip at right bottom of the pointer
               return [point[0] + 20, point[1] + 30]
@@ -350,7 +274,6 @@ function run(
         show: true,
         showDataShadow: false,
         yAxisIndex: [0],
-        left: '91%',
         start: 0,
         end: 100,
         labelFormatter: function (value: number) {
@@ -384,7 +307,7 @@ function run(
       },
     },
     grid: {
-      // right: 0,
+      right: 50,
       left: 50,
     },
     series: seriesList,
