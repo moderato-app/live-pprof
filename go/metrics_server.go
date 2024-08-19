@@ -32,7 +32,7 @@ func (m *MetricsServer) InuseSpaceMetrics(ctx context.Context, req *api.GoMetric
 	}
 	resp := goMetricsResp(mtr)
 
-	return &resp, nil
+	return resp, nil
 }
 
 func (m *MetricsServer) CPUMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
@@ -44,7 +44,7 @@ func (m *MetricsServer) CPUMetrics(ctx context.Context, req *api.GoMetricsReques
 	}
 	resp := goMetricsResp(mtr)
 
-	return &resp, nil
+	return resp, nil
 }
 
 func metrics(ctx context.Context, baseUrl string, mt MetricsType) (*moderato.Metrics, error) {
@@ -80,7 +80,7 @@ func metrics(ctx context.Context, baseUrl string, mt MetricsType) (*moderato.Met
 	return moderato.GetMetrics(resp.Body)
 }
 
-func goMetricsResp(mtr *moderato.Metrics) api.GoMetricsResponse {
+func goMetricsResp(mtr *moderato.Metrics) *api.GoMetricsResponse {
 	var pbItems []*api.Item
 
 	pbItems = append(pbItems, &api.Item{
@@ -104,5 +104,5 @@ func goMetricsResp(mtr *moderato.Metrics) api.GoMetricsResponse {
 		Items: pbItems,
 		Total: mtr.Total,
 	}
-	return resp
+	return &resp
 }
