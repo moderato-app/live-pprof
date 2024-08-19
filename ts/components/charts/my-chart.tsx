@@ -1,22 +1,20 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import ReactECharts from 'echarts-for-react'
-import { DatasetComponentOption } from 'echarts/components'
-import { connect, registerTheme, SeriesOption } from 'echarts'
+import { connect, registerTheme } from 'echarts'
 import { useTheme } from 'next-themes'
-import prettyBytes from 'pretty-bytes'
-import { Checkbox } from '@nextui-org/checkbox'
-import _ from 'lodash'
 import { useAtom } from 'jotai'
 import grpcWeb from 'grpc-web'
+import ReactECharts from 'echarts-for-react'
 
 import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
 import { metricClient } from '@/components/client/metrics'
-import { freezeTooltipAtom, inuseSpacePrefAtom, showTooltipAtom } from '@/components/atom/shared-atom'
+import { freezeTooltipAtom, inuseSpacePrefAtom } from '@/components/atom/shared-atom'
 import darkTheme from '@/components/charts/dark-theme'
 import { GraphData } from '@/components/charts/data-structure'
 import { appendGraphData } from '@/components/charts/data-operation'
+import { op } from '@/components/charts/archive'
+import { ChartPref } from '@/components/charts/chart-pref'
 
 registerTheme('dark', darkTheme())
 
@@ -25,11 +23,6 @@ export const MyEcharts: React.FC = () => {
   const ref = useRef<any>()
   const [graphData, setGraphData] = useState<GraphData>({ lineTable: {}, dates: [] })
   const [freezeTooltip, setFreezeTooltip] = useAtom(freezeTooltipAtom)
-  const [showTooltip, setShowTooltip] = useAtom(showTooltipAtom)
-  const [inuseSpacePref, setInuseSpacePrefAtom] = useAtom(inuseSpacePrefAtom)
-  const setTotal = (total: boolean) => setInuseSpacePrefAtom({ ...inuseSpacePref, total: total })
-  const setSmooth = (smooth: boolean) => setInuseSpacePrefAtom({ ...inuseSpacePref, smooth: smooth })
-  const setLine = (line: boolean) => setInuseSpacePrefAtom({ ...inuseSpacePref, line: line })
 
   useEffect(() => {
     if (ref.current) {
@@ -71,6 +64,7 @@ export const MyEcharts: React.FC = () => {
       streams.forEach(p => p.cancel())
     }
   }, [])
+  const [pref, setPref] = useAtom(inuseSpacePrefAtom)
 
   return (
     <section
@@ -78,238 +72,42 @@ export const MyEcharts: React.FC = () => {
       role="presentation"
       onClick={() => {
         setFreezeTooltip(false)
-        setShowTooltip(false)
-        setTimeout(() => setShowTooltip(true), 1000)
+        console.log('ref.current', ref.current)
+        const ins = ref.current?.getEchartsInstance()
+        if (ins) {
+          let tooltip = window.document.getElementById('tooltip')
+          if (tooltip) {
+            tooltip.remove()
+          }
+        }
       }}
     >
+      {/*<EChartComponent*/}
+      {/*  key={`abc`}*/}
+      {/*  freezeTooltip={freezeTooltip}*/}
+      {/*  graphData={graphData}*/}
+      {/*  pref={inuseSpacePrefAtom}*/}
+      {/*  showTooltip={showTooltip}*/}
+      {/*  theme={theme.resolvedTheme == 'dark' ? 'dark' : ''}*/}
+      {/*/>*/}
       <div
         className="flex gap-10 items-center"
         role="presentation"
         onClick={event => {
           setFreezeTooltip(true)
-          setShowTooltip(true)
           event.stopPropagation()
         }}
       >
-        {/*@ts-ignore*/}
         <ReactECharts
-          key={`${inuseSpacePref.total}`}
+          ref={ref}
+          key={`${pref.total}`}
           // key={`${total}+${showTooltip}`}
           className="w-full"
-          option={run(
-            graphData,
-            theme.resolvedTheme == 'dark',
-            inuseSpacePref.total,
-            inuseSpacePref.smooth,
-            inuseSpacePref.line,
-            freezeTooltip,
-            showTooltip
-          )}
+          option={op(graphData, theme.resolvedTheme == 'dark', pref.total, pref.smooth, pref.line, freezeTooltip)}
           theme={theme.resolvedTheme == 'dark' ? 'dark' : ''}
         />
-        <div className={'flex flex-col gap-1'}>
-          <Checkbox isSelected={inuseSpacePref.total} size="sm" value="Total" onValueChange={setTotal}>
-            Total
-          </Checkbox>
-          <Checkbox
-            className="whitespace-nowrap"
-            isSelected={inuseSpacePref.line}
-            size="sm"
-            value="Line"
-            onValueChange={setLine}
-          >
-            Line of Code
-          </Checkbox>
-          <Checkbox isSelected={inuseSpacePref.smooth} size="sm" value="Smooth" onValueChange={setSmooth}>
-            Smooth
-          </Checkbox>
-        </div>
-
-        <div className="flex gap-3"></div>
+        <ChartPref pref={inuseSpacePrefAtom} />
       </div>
     </section>
   )
-}
-
-function run(
-  graphData: GraphData,
-  isDark: boolean,
-  total: boolean,
-  smooth: boolean,
-  showLine: boolean,
-  freezeTooltip: boolean,
-  showTooltip: boolean
-) {
-  const dataset: DatasetComponentOption[] = Object.keys(graphData.lineTable).map(key => ({
-    id: key,
-    source: graphData.lineTable[key].points,
-  }))
-
-  const seriesList: SeriesOption[] = Object.keys(graphData.lineTable)
-    .filter(key => total || key !== 'total ')
-    .map(key => ({
-      type: 'line',
-      datasetId: key,
-      showSymbol: false,
-      name: key,
-      smooth: smooth,
-      labelLayout: {
-        moveOverlap: 'shiftY',
-      },
-      emphasis: {
-        focus: 'series',
-      },
-      encode: {
-        x: 'date',
-        y: 'flat',
-        itemName: 'date',
-        tooltip: ['flat'],
-      },
-    }))
-
-  // noinspection JSUnusedGlobalSymbols
-  return {
-    animationDuration: 100,
-    // legend: {
-    //   type: 'plain',
-    //   calculable: true,
-    //   bottom: 0,
-    // },
-    dataset: dataset,
-    title: {
-      text: 'inuse_space',
-    },
-    tooltip: showTooltip
-      ? {
-          order: 'valueDesc',
-          trigger: 'axis',
-          alwaysShowContent: freezeTooltip,
-          // hideDelay: 10_000,
-          enterable: true,
-          // triggerOn: 'click',
-          triggerOn: freezeTooltip ? 'click' : 'mousemove|click',
-          // https://github.com/apache/echarts/issues/9763#issuecomment-1446643093
-          // remove items that have null flat value
-          formatter: function (params: any[]) {
-            params = _.uniqBy(params, p => p.seriesId)
-            let output =
-              ` <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` +
-              '<br/>'
-
-            output += '<div class="w-full cursor-pointer select-text">'
-
-            params.forEach(p => {
-              const value = p.value.flat
-              const splits = p.seriesName.split(' ')
-              const func = splits[0]
-              const line = splits[1]
-              const lineHtml =
-                showLine && p.seriesName != 'total '
-                  ? `<div class="flex items-center">
-                  <div class="opacity-0">${p.marker}</div>
-                  <span class="text-default-500">${line}</span>
-                </div>`
-                  : ''
-              if (value) {
-                output += `<div class="flex flex-col gap-0.5">
-              <div class="flex flex-col">
-                <div class="flex items-center justify-between gap-8">
-                  <div class="flex gap-0.5">
-                    <div class="translate-y-0.5">${p.marker}</div>
-                    <span class="text-default-600 text-center">${func}</span>
-                  </div>
-  
-                  <div class="font-bold text-default-600">${prettyBytes(value)}</div>
-                </div>
-                ${lineHtml}
-              </div">              
-            </div>`
-              }
-            })
-
-            return output + '</div>'
-          },
-
-          valueFormatter: function (value: number | string, _dataIndex: number): string | undefined {
-            if (typeof value === 'number' && value) {
-              return prettyBytes(value as number)
-            } else {
-              return undefined
-            }
-          },
-          backgroundColor: isDark ? '#2e2e2e' : 'white',
-          borderColor: isDark ? '#2e2e2e' : 'white',
-          textStyle: isDark
-            ? {
-                color: '#e3e3e3',
-              }
-            : null,
-          position: function (
-            point: Array<number>,
-            _params: any | Array<any>,
-            dom: HTMLElement,
-            _rect: any,
-            size: any
-          ) {
-            if (point[0] + dom.clientWidth + 20 < size.viewSize[0]) {
-              // place tooltip at right bottom of the pointer
-              return [point[0] + 20, point[1] + 30]
-            } else {
-              // if tooltip will be outside the graph, place it at left bottom of the pointer
-              return [point[0] - dom.clientWidth - 20, point[1] + 30]
-            }
-          },
-        }
-      : {},
-    dataZoom: [
-      {
-        type: 'slider',
-        show: true,
-        xAxisIndex: [0],
-        start: 0,
-        end: 100,
-      },
-      {
-        type: 'slider',
-        show: true,
-        showDataShadow: false,
-        yAxisIndex: [0],
-        start: 0,
-        end: 100,
-        labelFormatter: function (value: number) {
-          return isNaN(value) ? '' : prettyBytes(value)
-        },
-      },
-      {
-        type: 'inside',
-        xAxisIndex: [0],
-        start: 0,
-        end: 100,
-      },
-    ],
-    xAxis: {
-      type: 'time',
-      nameLocation: 'middle',
-    },
-    yAxis: {
-      // name: 'inuse_space',
-      axisLabel: {
-        formatter: function (value: number) {
-          return prettyBytes(value)
-        },
-      },
-    },
-    toolbox: {
-      feature: {
-        saveAsImage: {
-          pixelRatio: 2,
-        },
-      },
-    },
-    grid: {
-      right: 50,
-      left: 50,
-    },
-    series: seriesList,
-  }
 }
