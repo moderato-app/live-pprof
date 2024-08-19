@@ -7,8 +7,9 @@ import { connect, SeriesOption } from 'echarts'
 import { useTheme } from 'next-themes'
 import { ClientReadableStream } from 'grpc-web'
 import prettyBytes from 'pretty-bytes'
-import { Checkbox, CheckboxGroup } from '@nextui-org/checkbox'
-import { Switch } from '@nextui-org/switch'
+import { Checkbox } from '@nextui-org/checkbox'
+import _ from 'lodash'
+import { useAtom } from 'jotai'
 
 import {
   FullMetricsRequest,
@@ -18,7 +19,7 @@ import {
 } from '@/components/api/api_pb'
 import { metricClient } from '@/components/client/metrics'
 import { convertUnixNanoToDate } from '@/components/util/util'
-import _ from 'lodash'
+import { freezeTooltipAtom, inuseSpacePrefAtom, showTooltipAtom } from '@/components/atom/shared-atom'
 
 type Point = {
   date: Date
@@ -81,9 +82,12 @@ export const MyEcharts5: React.FC = () => {
   const theme = useTheme()
   const ref = useRef<any>()
   const [graphData, setGraphData] = useState<GraphData>({ lineTable: {}, dates: [] })
-  const [total, setTotal] = useState(false)
-  const [line, setLine] = useState(false)
-  const [smooth, setSmooth] = useState(false)
+  const [freezeTooltip, setFreezeTooltip] = useAtom(freezeTooltipAtom)
+  const [showTooltip, setShowTooltip] = useAtom(showTooltipAtom)
+  const [inuseSpacePref, setInuseSpacePrefAtom] = useAtom(inuseSpacePrefAtom)
+  const setTotal = (total: boolean) => setInuseSpacePrefAtom({ ...inuseSpacePref, total: total })
+  const setSmooth = (smooth: boolean) => setInuseSpacePrefAtom({ ...inuseSpacePref, smooth: smooth })
+  const setLine = (line: boolean) => setInuseSpacePrefAtom({ ...inuseSpacePref, line: line })
 
   useEffect(() => {
     if (ref.current) {
@@ -132,57 +136,98 @@ export const MyEcharts5: React.FC = () => {
   }, [])
 
   return (
-    <div className="flex gap-10 items-center">
-      {/*@ts-ignore*/}
-      <ReactECharts
-        className="w-full"
-        key={total}
-        option={run(graphData, theme.resolvedTheme == 'dark', total, smooth, line)}
-        theme={theme.resolvedTheme == 'dark' ? 'dark' : ''}
-      />
-      <CheckboxGroup defaultValue={[]} label="Graph options">
-        <Checkbox isSelected={total} size="sm" value="Total" onValueChange={setTotal}>
-          Total
-        </Checkbox>
-        <Checkbox className="whitespace-nowrap" isSelected={line} size="sm" value="Line" onValueChange={setLine}>
-          Line of Code
-        </Checkbox>
-        <Checkbox isSelected={smooth} size="sm" value="Smooth" onValueChange={setSmooth}>
-          Smooth
-        </Checkbox>
-      </CheckboxGroup>
+    <section
+      className="h-full w-full"
+      role="presentation"
+      onClick={() => {
+        setFreezeTooltip(false)
+        setShowTooltip(false)
+        setTimeout(() => setShowTooltip(true), 1000)
+      }}
+    >
+      <div
+        className="flex gap-10 items-center"
+        role="presentation"
+        onClick={event => {
+          setFreezeTooltip(true)
+          setShowTooltip(true)
+          event.stopPropagation()
+        }}
+      >
+        {/*@ts-ignore*/}
+        <ReactECharts
+          key={inuseSpacePref.total}
+          // key={`${total}+${showTooltip}`}
+          className="w-full"
+          option={run(
+            graphData,
+            theme.resolvedTheme == 'dark',
+            inuseSpacePref.total,
+            inuseSpacePref.smooth,
+            inuseSpacePref.line,
+            freezeTooltip,
+            showTooltip
+          )}
+          theme={theme.resolvedTheme == 'dark' ? 'dark' : ''}
+        />
+        <div className={'flex flex-col gap-1'}>
+          <Checkbox isSelected={inuseSpacePref.total} size="sm" value="Total" onValueChange={setTotal}>
+            Total
+          </Checkbox>
+          <Checkbox
+            className="whitespace-nowrap"
+            isSelected={inuseSpacePref.line}
+            size="sm"
+            value="Line"
+            onValueChange={setLine}
+          >
+            Line of Code
+          </Checkbox>
+          <Checkbox isSelected={inuseSpacePref.smooth} size="sm" value="Smooth" onValueChange={setSmooth}>
+            Smooth
+          </Checkbox>
+        </div>
 
-      <div className="flex gap-3">
-        {/*<Switch isSelected={total} size="sm" onValueChange={setTotal}>*/}
-        {/*  Total*/}
-        {/*</Switch>*/}
-        {/*<Switch isSelected={line} size="sm" onValueChange={setLine}>*/}
-        {/*  Line*/}
-        {/*</Switch>*/}
-        {/*<Switch isSelected={smooth} size="sm" onValueChange={setSmooth}>*/}
-        {/*  Smooth*/}
-        {/*</Switch>*/}
+        <div className="flex gap-3">
+          {/*<Switch isSelected={total} size="sm" onValueChange={setTotal}>*/}
+          {/*  Total*/}
+          {/*</Switch>*/}
+          {/*<Switch isSelected={line} size="sm" onValueChange={setLine}>*/}
+          {/*  Line*/}
+          {/*</Switch>*/}
+          {/*<Switch isSelected={smooth} size="sm" onValueChange={setSmooth}>*/}
+          {/*  Smooth*/}
+          {/*</Switch>*/}
 
-        {/*<Dropdown>*/}
-        {/*  <DropdownTrigger>*/}
-        {/*    <Button size={'sm'} variant="light">*/}
-        {/*      ...*/}
-        {/*    </Button>*/}
-        {/*  </DropdownTrigger>*/}
-        {/*  <DropdownMenu aria-label="Static Actions">*/}
-        {/*    <DropdownItem key="smotth">*/}
-        {/*      <Switch isSelected={smooth} size="sm" onValueChange={setSmooth}>*/}
-        {/*        Smooth*/}
-        {/*      </Switch>*/}
-        {/*    </DropdownItem>*/}
-        {/*  </DropdownMenu>*/}
-        {/*</Dropdown>*/}
+          {/*<Dropdown>*/}
+          {/*  <DropdownTrigger>*/}
+          {/*    <Button size={'sm'} variant="light">*/}
+          {/*      ...*/}
+          {/*    </Button>*/}
+          {/*  </DropdownTrigger>*/}
+          {/*  <DropdownMenu aria-label="Static Actions">*/}
+          {/*    <DropdownItem key="smotth">*/}
+          {/*      <Switch isSelected={smooth} size="sm" onValueChange={setSmooth}>*/}
+          {/*        Smooth*/}
+          {/*      </Switch>*/}
+          {/*    </DropdownItem>*/}
+          {/*  </DropdownMenu>*/}
+          {/*</Dropdown>*/}
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 
-function run(graphData: GraphData, isDark: boolean, total: boolean, smooth: boolean, showLine: boolean) {
+function run(
+  graphData: GraphData,
+  isDark: boolean,
+  total: boolean,
+  smooth: boolean,
+  showLine: boolean,
+  freezeTooltip: boolean,
+  showTooltip: boolean
+) {
   const dataset: DatasetComponentOption[] = Object.keys(graphData.lineTable).map(key => ({
     id: key,
     source: graphData.lineTable[key].points,
@@ -221,35 +266,39 @@ function run(graphData: GraphData, isDark: boolean, total: boolean, smooth: bool
     title: {
       text: 'inuse_space',
     },
-    tooltip: {
-      order: 'valueDesc',
-      trigger: 'axis',
-      enterable: true,
-      triggerOn: 'mousemove|click',
-      // https://github.com/apache/echarts/issues/9763#issuecomment-1446643093
-      // remove items that have null flat value
-      formatter: function (params: any[]) {
-        params = _.uniqBy(params, p => p.seriesId)
-        let output =
-          ` <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` +
-          '<br/>'
+    tooltip: showTooltip
+      ? {
+          order: 'valueDesc',
+          trigger: 'axis',
+          alwaysShowContent: freezeTooltip,
+          // hideDelay: 10_000,
+          enterable: true,
+          // triggerOn: 'click',
+          triggerOn: freezeTooltip ? 'click' : 'mousemove|click',
+          // https://github.com/apache/echarts/issues/9763#issuecomment-1446643093
+          // remove items that have null flat value
+          formatter: function (params: any[]) {
+            params = _.uniqBy(params, p => p.seriesId)
+            let output =
+              ` <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` +
+              '<br/>'
 
-        output += '<div class="w-full cursor-pointer select-text">'
+            output += '<div class="w-full cursor-pointer select-text">'
 
-        params.forEach(p => {
-          const value = p.value.flat
-          const splits = p.seriesName.split(' ')
-          const func = splits[0]
-          const line = splits[1]
-          const lineHtml =
-            showLine && p.seriesName != 'total '
-              ? `<div class="flex items-center">
+            params.forEach(p => {
+              const value = p.value.flat
+              const splits = p.seriesName.split(' ')
+              const func = splits[0]
+              const line = splits[1]
+              const lineHtml =
+                showLine && p.seriesName != 'total '
+                  ? `<div class="flex items-center">
                   <div class="opacity-0">${p.marker}</div>
                   <span class="text-default-500">${line}</span>
                 </div>`
-              : ''
-          if (value) {
-            output += `<div class="flex flex-col gap-0.5">
+                  : ''
+              if (value) {
+                output += `<div class="flex flex-col gap-0.5">
               <div class="flex flex-col">
                 <div class="flex items-center justify-between gap-8">
                   <div class="flex gap-0.5">
@@ -262,42 +311,62 @@ function run(graphData: GraphData, isDark: boolean, total: boolean, smooth: bool
                 ${lineHtml}
               </div">              
             </div>`
-          }
-        })
+              }
+            })
 
-        return output + '</div>'
-      },
+            return output + '</div>'
+          },
 
-      valueFormatter: function (value: number | string, dataIndex: number): string | undefined {
-        if (typeof value === 'number' && value) {
-          return prettyBytes(value as number)
-        } else {
-          return undefined
+          valueFormatter: function (value: number | string, dataIndex: number): string | undefined {
+            if (typeof value === 'number' && value) {
+              return prettyBytes(value as number)
+            } else {
+              return undefined
+            }
+          },
+          backgroundColor: isDark ? '#2e2e2e' : 'white',
+          borderColor: isDark ? '#2e2e2e' : 'white',
+          textStyle: isDark
+            ? {
+                color: '#e3e3e3',
+              }
+            : null,
+          position: function (point: Array<number>, params: any | Array<any>, dom: HTMLElement, rect: any, size: any) {
+            if (point[0] + dom.clientWidth + 20 < size.viewSize[0]) {
+              // place tooltip at right bottom of the pointer
+              return [point[0] + 20, point[1] + 30]
+            } else {
+              // if tooltip will be outside the graph, place it at left bottom of the pointer
+              return [point[0] - dom.clientWidth - 20, point[1] + 30]
+            }
+          },
         }
-      },
-      backgroundColor: isDark ? '#2e2e2e' : 'white',
-      borderColor: isDark ? '#2e2e2e' : 'white',
-      textStyle: isDark
-        ? {
-            color: '#e3e3e3',
-          }
-        : null,
-      position: function (point: Array<number>, params: any | Array<any>, dom: HTMLElement, rect: any, size: any) {
-        if (point[0] + dom.clientWidth + 20 < size.viewSize[0]) {
-          // place tooltip at right bottom of the pointer
-          return [point[0] + 20, point[1] + 30]
-        } else {
-          // if tooltip will be outside the graph, place it at left bottom of the pointer
-          return [point[0] - dom.clientWidth - 20, point[1] + 30]
-        }
-      },
-    },
+      : {},
     dataZoom: [
       {
-        type: 'inside',
+        type: 'slider',
+        show: true,
+        xAxisIndex: [0],
+        start: 0,
+        end: 100,
       },
       {
         type: 'slider',
+        show: true,
+        showDataShadow: false,
+        yAxisIndex: [0],
+        left: '91%',
+        start: 0,
+        end: 100,
+        labelFormatter: function (value: number) {
+          return isNaN(value) ? '' : prettyBytes(value)
+        },
+      },
+      {
+        type: 'inside',
+        xAxisIndex: [0],
+        start: 0,
+        end: 100,
       },
     ],
     xAxis: {
@@ -320,7 +389,7 @@ function run(graphData: GraphData, isDark: boolean, total: boolean, smooth: bool
       },
     },
     grid: {
-      right: 0,
+      // right: 0,
       left: 50,
     },
     series: seriesList,
