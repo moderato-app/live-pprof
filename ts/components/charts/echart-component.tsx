@@ -35,7 +35,8 @@ export const EChartComponent: React.FC<ChartProps> = props => {
 
 export const useChartOptions = (props: ChartProps) => {
   const { graphData, theme, freezeTooltip, showTooltip } = props
-  const { total, smooth, line } = useSnapshot(graphPrefsState.inuseSpace)
+  const { total } = useSnapshot(graphPrefsState.inuseSpace)
+  const { smooth } = useSnapshot(graphPrefsState)
 
   const dataset = useMemo(() => generateDataset(graphData), [])
   const seriesList = useMemo(
@@ -104,7 +105,7 @@ export const useChartOptions = (props: ChartProps) => {
         }
       },
     }
-  }, [showTooltip, freezeTooltip, theme, line])
+  }, [showTooltip, freezeTooltip, theme])
 
   return {
     animationDuration: 100,

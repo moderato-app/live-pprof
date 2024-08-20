@@ -8,23 +8,22 @@ import { useSnapshot } from 'valtio/react'
 
 import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
-import { metricClient, mockMetricClient } from '@/components/client/metrics'
+import { mockMetricClient } from '@/components/client/metrics'
 import darkTheme from '@/components/charts/dark-theme'
 import { GraphData } from '@/components/charts/data-structure'
 import { appendGraphData } from '@/components/charts/data-operation'
 import { op } from '@/components/charts/archive'
-import { ChartPref } from '@/components/charts/chart-pref'
 import { graphPrefsState } from '@/components/state/pref-state'
 import { uiState } from '@/components/state/ui-state'
 
 registerTheme('dark', darkTheme())
 
-export const MyEcharts: React.FC = () => {
+export const HeapGraph: React.FC = () => {
   const theme = useTheme()
   const ref = useRef<any>()
   const [graphData, setGraphData] = useState<GraphData>({ lineTable: {}, dates: [] })
   const uiSnap = useSnapshot(uiState)
-  const { inuseSpace } = useSnapshot(graphPrefsState)
+  const { inuseSpace, smooth } = useSnapshot(graphPrefsState)
 
   useEffect(() => {
     if (ref.current) {
@@ -32,7 +31,7 @@ export const MyEcharts: React.FC = () => {
       instance.group = 'group1'
       connect('group1')
     }
-  }, [])
+  }, [ref])
 
   useEffect(() => {
     const req = new GoMetricsRequest().setUrl('http://localhost:2379/debug/pprof')
@@ -49,9 +48,9 @@ export const MyEcharts: React.FC = () => {
           }
 
           if (err) {
-            console.log('inuseSpaceMetrics err', err)
+            console.debug('inuseSpaceMetrics err', err)
           } else {
-            console.log('inuseSpaceMetrics resp', response)
+            console.debug('inuseSpaceMetrics resp', response)
             setGraphData(prevData => {
               return appendGraphData(prevData, response)
             })
@@ -72,21 +71,7 @@ export const MyEcharts: React.FC = () => {
   }, [])
 
   return (
-    <section
-      className="h-full w-full"
-      role="presentation"
-      onClick={() => {
-        uiState.freezeTooltip = false
-        console.log('ref.current', ref.current)
-        const ins = ref.current?.getEchartsInstance()
-        if (ins) {
-          let tooltip = window.document.getElementById('tooltip')
-          if (tooltip) {
-            tooltip.remove()
-          }
-        }
-      }}
-    >
+    <section className="w-full h-[50%]">
       {/*<EChartComponent*/}
       {/*  key={`abc`}*/}
       {/*  freezeTooltip={freezeTooltip}*/}
@@ -96,7 +81,7 @@ export const MyEcharts: React.FC = () => {
       {/*  theme={theme.resolvedTheme == 'dark' ? 'dark' : ''}*/}
       {/*/>*/}
       <div
-        className="flex gap-10 items-center"
+        className="flex gap-10 items-center h-full"
         role="presentation"
         onClick={event => {
           uiState.freezeTooltip = true
@@ -104,21 +89,21 @@ export const MyEcharts: React.FC = () => {
         }}
       >
         <ReactECharts
+          key={`${inuseSpace.total}`}
           ref={ref}
+          className="p-1 border-2 border-dotted border-default-400 rounded-xl"
           option={op(
+            'Memory',
             graphData,
             theme.resolvedTheme == 'dark',
             inuseSpace.total,
-            inuseSpace.smooth,
-            inuseSpace.line,
+            smooth,
+            false,
             uiSnap.freezeTooltip
           )}
+          style={{ height: '100%', width: '100%' }}
           theme={theme.resolvedTheme == 'dark' ? 'dark' : ''}
-          key={`${inuseSpace.total}`}
-          // key={`${total}+${showTooltip}`}
-          className="w-full"
         />
-        <ChartPref graphPrefProxy={graphPrefsState.inuseSpace} />
       </div>
     </section>
   )

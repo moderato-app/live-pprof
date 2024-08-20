@@ -82,6 +82,23 @@ export const SunFilledIcon = ({ size = 24, width, height, ...props }: IconSvgPro
   </svg>
 )
 
+export const CurveIcon = ({ size = 14, width, height, ...props }: IconSvgProps) => (
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    height={size || height}
+    role="presentation"
+    viewBox="0 0 12 12"
+    width={size || width}
+    {...props}
+  >
+    <path
+      d="M1 9.6V10H1.8V9.6H1ZM11.4 2.4V2H10.6V2.4H11.4ZM1.8 9.6C1.8 8.4368 1.9952 7.296 2.3656 6.4624C2.7416 5.616 3.2384 5.2 3.8 5.2V4.4C2.7616 4.4 2.0576 5.184 1.6344 6.1376C1.2048 7.104 1 8.3632 1 9.6H1.8ZM3.8 5.2C4.056 5.2 4.3136 5.3264 4.604 5.5936C4.8968 5.864 5.1744 6.232 5.48 6.64C5.7744 7.032 6.096 7.464 6.4536 7.7936C6.8136 8.1264 7.2568 8.4 7.8 8.4V7.6C7.544 7.6 7.2864 7.4736 6.996 7.2064C6.704 6.936 6.4256 6.568 6.12 6.16C5.8256 5.768 5.504 5.336 5.1464 5.0064C4.7864 4.6736 4.3432 4.4 3.8 4.4V5.2ZM7.8 8.4C8.7784 8.4 9.6904 7.7896 10.3384 6.764C10.988 5.7344 11.4 4.2552 11.4 2.4H10.6C10.6 4.144 10.212 5.4656 9.6616 6.336C9.1096 7.2112 8.4216 7.6 7.8 7.6V8.4Z"
+      fill="currentColor"
+    />
+  </svg>
+)
+
 export const HeartFilledIcon = ({ size = 24, width, height, ...props }: IconSvgProps) => (
   <svg
     aria-hidden="true"

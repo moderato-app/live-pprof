@@ -1,26 +1,24 @@
 'use client'
 import { proxy, subscribe } from 'valtio'
 
-const graphsPrefsLSKey = 'graph prefs v3'
+const graphsPrefsLSKey = 'graph prefs v9'
 
 export type GraphPref = {
   total: boolean
-  line: boolean
-  smooth: boolean
 }
 
 const newGraphPref = (): GraphPref => ({
   total: false,
-  line: false,
-  smooth: false,
 })
 
 export type GraphPrefs = {
   inuseSpace: GraphPref
+  smooth: boolean
 }
 
 const newGraphPrefs = (): GraphPrefs => ({
   inuseSpace: newGraphPref(),
+  smooth: false,
 })
 
 const IS_CLIENT = typeof window !== 'undefined'

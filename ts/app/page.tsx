@@ -1,5 +1,5 @@
-import { MyEcharts } from '@/components/charts/my-chart'
+import { AllGraphs } from '@/components/charts/all-graphs'
 
 export default function Home() {
-  return <MyEcharts />
+  return <AllGraphs />
 }
