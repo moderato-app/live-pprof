@@ -2,17 +2,15 @@ import ReactECharts from 'echarts-for-react'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
 import prettyBytes from 'pretty-bytes'
-import { WritableAtom } from 'jotai/vanilla/atom'
-import { useAtom } from 'jotai/index'
+import { useSnapshot } from 'valtio/react'
 
 import { generateDataset, generateSeriesList } from '@/components/charts/option'
 import { GraphData } from '@/components/charts/data-structure'
-import { Pref } from '@/components/atom/shared-atom'
+import { graphPrefsState } from '@/components/state/pref-state'
 
 export type ChartProps = {
   graphData: GraphData
   theme: '' | 'dark'
-  pref: WritableAtom<Pref, any, void>
 
   freezeTooltip: boolean
   showTooltip: boolean
@@ -20,30 +18,29 @@ export type ChartProps = {
 
 export const EChartComponent: React.FC<ChartProps> = props => {
   const options = useChartOptions(props)
-  const [pref, setPref] = useAtom(props.pref)
 
-  const dataZoomHandler = (event: any) => {
-    setPref({ ...pref, sliderRange: [event.start, event.end, pref.sliderRange.yStart, pref.sliderRange.yEnd] })
-  }
+  // const dataZoomHandler = (event: any) => {
+  //   setPref({ ...pref, sliderRange: [event.start, event.end, pref.sliderRange.yStart, pref.sliderRange.yEnd] })
+  // }
 
   return (
     <ReactECharts
       className="w-full"
       option={options}
       theme={props.theme === 'dark' ? 'dark' : ''}
-      onEvents={{ dataZoom: dataZoomHandler }}
+      // onEvents={{ dataZoom: dataZoomHandler }}
     />
   )
 }
 
 export const useChartOptions = (props: ChartProps) => {
   const { graphData, theme, freezeTooltip, showTooltip } = props
-  const [pref] = useAtom(props.pref)
+  const { total, smooth, line } = useSnapshot(graphPrefsState.inuseSpace)
 
   const dataset = useMemo(() => generateDataset(graphData), [])
   const seriesList = useMemo(
-    () => generateSeriesList(Object.keys(graphData.lineTable), pref.total, pref.smooth),
-    [graphData.lineTable, pref]
+    () => generateSeriesList(Object.keys(graphData.lineTable), total, smooth),
+    [graphData.lineTable, total, smooth]
   )
 
   const tooltip = useMemo(() => {
@@ -66,7 +63,7 @@ export const useChartOptions = (props: ChartProps) => {
           const func = splits[0]
           const line = splits[1]
           const lineHtml =
-            pref.line && p.seriesName !== 'total '
+            line && p.seriesName !== 'total '
               ? `<div class="flex items-center">
                   <div class="opacity-0">${p.marker}</div>
                   <span class="text-default-500">${line}</span>
@@ -107,7 +104,7 @@ export const useChartOptions = (props: ChartProps) => {
         }
       },
     }
-  }, [showTooltip, freezeTooltip, theme, pref])
+  }, [showTooltip, freezeTooltip, theme, line])
 
   return {
     animationDuration: 100,

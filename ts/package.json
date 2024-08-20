@@ -34,8 +34,7 @@
     "@nextui-org/dropdown": "^2.1.29",
     "@nextui-org/theme": "^2.2.9",
     "dayjs": "^1.11.12",
-    "echarts-for-react": "^3.0.2",
-    "jotai": "^2.9.3"
+    "echarts-for-react": "^3.0.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",

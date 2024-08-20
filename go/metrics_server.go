@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -77,7 +78,22 @@ func metrics(ctx context.Context, baseUrl string, mt MetricsType) (*moderato.Met
 		return nil, err
 	}
 	defer resp.Body.Close()
-	return moderato.GetMetrics(resp.Body)
+
+	data, err := io.ReadAll(resp.Body)
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		internal.Sugar.Error("resp.Body: \n" + string(data))
+		return nil, errors.New("bad status code: " + resp.Status)
+	}
+
+	mtr, err := moderato.GetMetricsFromData(data)
+	if err != nil {
+		internal.Sugar.Error(err)
+		internal.Sugar.Error("resp.Body: \n" + string(data))
+		return nil, err
+	}
+
+	return mtr, nil
 }
 
 func goMetricsResp(mtr *moderato.Metrics) *api.GoMetricsResponse {
