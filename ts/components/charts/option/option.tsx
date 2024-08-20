@@ -5,7 +5,7 @@ import prettyBytes from 'pretty-bytes'
 
 import { GraphData } from '@/components/charts/data-structure'
 
-export function op(
+export function option(
   name: string,
   graphData: GraphData,
   isDark: boolean,

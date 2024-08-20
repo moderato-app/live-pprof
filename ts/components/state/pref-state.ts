@@ -1,7 +1,7 @@
 'use client'
 import { proxy, subscribe } from 'valtio'
 
-const graphsPrefsLSKey = 'graph prefs v9'
+const graphsPrefsLSKey = 'graph prefs v11'
 
 export type GraphPref = {
   total: boolean
@@ -12,12 +12,14 @@ const newGraphPref = (): GraphPref => ({
 })
 
 export type GraphPrefs = {
-  inuseSpace: GraphPref
+  memory: GraphPref
+  cpu: GraphPref
   smooth: boolean
 }
 
 const newGraphPrefs = (): GraphPrefs => ({
-  inuseSpace: newGraphPref(),
+  memory: newGraphPref(),
+  cpu: newGraphPref(),
   smooth: false,
 })
 

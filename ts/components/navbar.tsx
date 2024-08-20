@@ -7,7 +7,7 @@ import clsx from 'clsx'
 import { siteConfig } from '@/config/site'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { GithubIcon } from '@/components/icons'
-import { SmoothSwitch } from '@/components/charts/smooth-switch'
+import { SmoothSwitch } from '@/components/smooth-switch'
 
 export const Navbar = () => {
   return (
