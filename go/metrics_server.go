@@ -21,12 +21,21 @@ const (
 )
 
 type MetricsServer struct {
-	api.UnimplementedMetricServer
+	api.UnimplementedMetricsServer
+}
+
+func newMetricsServer() *MetricsServer {
+	return &MetricsServer{}
 }
 
 func (m *MetricsServer) InuseSpaceMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	internal.Sugar.Debug("InuseSpaceMetrics req:", req)
-	mtr, err := metrics(ctx, req.Url, MetricsTypeInuseSpace)
+	u, err := prepareUrl(req.Url, MetricsTypeInuseSpace)
+	if err != nil {
+		return nil, err
+	}
+
+	mtr, err := metrics(ctx, u)
 	if err != nil {
 		internal.Sugar.Error(err)
 		return nil, err
@@ -38,38 +47,22 @@ func (m *MetricsServer) InuseSpaceMetrics(ctx context.Context, req *api.GoMetric
 
 func (m *MetricsServer) CPUMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	internal.Sugar.Debug("CPUMetrics req:", req)
-	mtr, err := metrics(ctx, req.Url, MetricsTypeCPU)
+	u, err := prepareUrl(req.Url, MetricsTypeCPU)
 	if err != nil {
-		internal.Sugar.Error(err)
 		return nil, err
 	}
+
+	mtr, err := metrics(ctx, u)
 	resp := goMetricsResp(mtr)
 
 	return resp, nil
 }
 
-func metrics(ctx context.Context, baseUrl string, mt MetricsType) (*moderato.Metrics, error) {
-	parse, err := url.Parse(baseUrl)
-	if err != nil {
-		return nil, errors.New("invalid url: " + baseUrl)
-	}
-
-	var u string
-	if mt == MetricsTypeInuseSpace {
-		u = parse.JoinPath("heap").String()
-	} else if mt == MetricsTypeCPU {
-		j := parse.JoinPath("profile")
-		params := url.Values{}
-		params.Add("seconds", "1")
-		j.RawQuery = params.Encode()
-		u = j.String()
-	} else {
-		return nil, errors.New("invalid metrics type")
-	}
+func metrics(ctx context.Context, url string) (*moderato.Metrics, error) {
 
 	client := &http.Client{}
-	internal.Sugar.Debugf("GET %s", u)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	internal.Sugar.Debugf("GET %s", url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +87,27 @@ func metrics(ctx context.Context, baseUrl string, mt MetricsType) (*moderato.Met
 	}
 
 	return mtr, nil
+}
+
+func prepareUrl(baseUrl string, mt MetricsType) (string, error) {
+	parse, err := url.Parse(baseUrl)
+	if err != nil {
+		return "", errors.New("invalid url: " + baseUrl)
+	}
+
+	var u string
+	if mt == MetricsTypeInuseSpace {
+		u = parse.JoinPath("heap").String()
+	} else if mt == MetricsTypeCPU {
+		j := parse.JoinPath("profile")
+		params := url.Values{}
+		params.Add("seconds", "1")
+		j.RawQuery = params.Encode()
+		u = j.String()
+	} else {
+		return "", errors.New("invalid metrics type")
+	}
+	return u, nil
 }
 
 func goMetricsResp(mtr *moderato.Metrics) *api.GoMetricsResponse {

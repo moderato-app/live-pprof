@@ -8,7 +8,7 @@ import { useSnapshot } from 'valtio/react'
 
 import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
-import { metricClient } from '@/components/client/metrics'
+import { metricClient, mockMetricClient } from '@/components/client/metrics'
 import darkTheme from '@/components/charts/dark-theme'
 import { GraphData } from '@/components/charts/data-structure'
 import { appendGraphData } from '@/components/charts/data-operation'
@@ -38,22 +38,26 @@ export const MyEcharts: React.FC = () => {
     const req = new GoMetricsRequest().setUrl('http://localhost:2379/debug/pprof')
     const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
     const t = setInterval(() => {
-      let stream = metricClient.cPUMetrics(req, null, (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
-        // remove stream from the list
-        const index = streams.indexOf(stream)
-        if (index > -1) {
-          streams.splice(index, 1)
-        }
+      let stream = mockMetricClient.inuseSpaceMetrics(
+        req,
+        null,
+        (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
+          // remove stream from the list
+          const index = streams.indexOf(stream)
+          if (index > -1) {
+            streams.splice(index, 1)
+          }
 
-        if (err) {
-          console.log('inuseSpaceMetrics err', err)
-        } else {
-          console.log('inuseSpaceMetrics resp', response)
-          setGraphData(prevData => {
-            return appendGraphData(prevData, response)
-          })
+          if (err) {
+            console.log('inuseSpaceMetrics err', err)
+          } else {
+            console.log('inuseSpaceMetrics resp', response)
+            setGraphData(prevData => {
+              return appendGraphData(prevData, response)
+            })
+          }
         }
-      })
+      )
       streams.push(stream)
     }, 1000)
 

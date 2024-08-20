@@ -8,9 +8,11 @@
     "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.11.1",
     "@nextui-org/button": "2.0.37",
     "@nextui-org/checkbox": "^2.1.4",
     "@nextui-org/code": "2.0.32",
+    "@nextui-org/dropdown": "^2.1.29",
     "@nextui-org/input": "2.2.4",
     "@nextui-org/kbd": "2.0.33",
     "@nextui-org/link": "2.0.34",
@@ -19,9 +21,13 @@
     "@nextui-org/snippet": "2.0.41",
     "@nextui-org/switch": "2.0.33",
     "@nextui-org/system": "2.2.5",
+    "@nextui-org/theme": "^2.2.9",
     "@react-aria/ssr": "3.9.4",
     "@react-aria/visually-hidden": "3.8.12",
     "clsx": "2.1.1",
+    "dayjs": "^1.11.12",
+    "echarts": "^5.5.1",
+    "echarts-for-react": "^3.0.2",
     "framer-motion": "~11.1.1",
     "google-protobuf": "^3.21.4",
     "grpc-web": "^1.5.0",
@@ -31,10 +37,7 @@
     "pretty-bytes": "^6.1.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "@nextui-org/dropdown": "^2.1.29",
-    "@nextui-org/theme": "^2.2.9",
-    "dayjs": "^1.11.12",
-    "echarts-for-react": "^3.0.2"
+    "valtio": "^1.13.2"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",

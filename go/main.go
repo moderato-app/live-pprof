@@ -10,6 +10,7 @@ func main() {
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 
-	api.RegisterMetricServer(grpcServer, &MetricsServer{})
+	api.RegisterMetricsServer(grpcServer, newMetricsServer())
+	api.RegisterMockMetricsServer(grpcServer, newMockMetricsServer())
 	internal.StartServeGrpc(grpcServer)
 }

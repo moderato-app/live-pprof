@@ -3,7 +3,13 @@ package server;
 
 option go_package = "github.com/moderato-app/live-pprof/api";
 
-service Metric {
+service Metrics {
+  rpc InuseSpaceMetrics(GoMetricsRequest) returns (GoMetricsResponse);
+  rpc CPUMetrics(GoMetricsRequest) returns (GoMetricsResponse);
+}
+
+// MockMetrics returns mock data instead of real data to save development time
+service MockMetrics {
   rpc InuseSpaceMetrics(GoMetricsRequest) returns (GoMetricsResponse);
   rpc CPUMetrics(GoMetricsRequest) returns (GoMetricsResponse);
 }
