@@ -8,6 +8,7 @@ import { siteConfig } from '@/config/site'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { GithubIcon } from '@/components/icons'
 import { SmoothSwitch } from '@/components/smooth-switch'
+import { MockSwitch } from '@/components/mock-switch'
 
 export const Navbar = () => {
   return (
@@ -38,6 +39,7 @@ export const Navbar = () => {
 
       <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end">
         <NavbarItem className="hidden sm:flex gap-2">
+          <MockSwitch />
           <SmoothSwitch />
           <ThemeSwitch />
           <Link isExternal aria-label="Github" href={siteConfig.links.github}>

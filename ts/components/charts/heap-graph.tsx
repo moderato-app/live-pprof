@@ -8,7 +8,7 @@ import { useSnapshot } from 'valtio/react'
 
 import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
-import { mockMetricClient } from '@/components/client/metrics'
+import { useMetricsClient } from '@/components/client/metrics'
 import { GraphData } from '@/components/charts/data-structure'
 import { appendGraphData } from '@/components/charts/data-operation'
 import { graphPrefsState } from '@/components/state/pref-state'
@@ -19,7 +19,7 @@ export const HeapGraph: React.FC = () => {
   const theme = useTheme()
   const ref = useRef<any>()
   const [graphData, setGraphData] = useState<GraphData>({ lineTable: {}, dates: [] })
-  const { total } = useSnapshot(graphPrefsState.memory)
+  const { total, flatOrCum } = useSnapshot(graphPrefsState.memory)
 
   const po = usePprofOption({
     name: 'Memory',
@@ -27,6 +27,8 @@ export const HeapGraph: React.FC = () => {
     graphPrefProxy: graphPrefsState.memory,
     pprofType: 'Memory',
   })
+
+  const client = useMetricsClient()
 
   useEffect(() => {
     if (ref.current) {
@@ -40,26 +42,22 @@ export const HeapGraph: React.FC = () => {
     const req = new GoMetricsRequest().setUrl('http://localhost:2379/debug/pprof')
     const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
     const t = setInterval(() => {
-      let stream = mockMetricClient.inuseSpaceMetrics(
-        req,
-        null,
-        (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
-          // remove stream from the list
-          const index = streams.indexOf(stream)
-          if (index > -1) {
-            streams.splice(index, 1)
-          }
-
-          if (err) {
-            console.debug('inuseSpaceMetrics err', err)
-          } else {
-            console.debug('inuseSpaceMetrics resp', response)
-            setGraphData(prevData => {
-              return appendGraphData(prevData, response)
-            })
-          }
+      let stream = client.inuseSpaceMetrics(req, null, (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
+        // remove stream from the list
+        const index = streams.indexOf(stream)
+        if (index > -1) {
+          streams.splice(index, 1)
         }
-      )
+
+        if (err) {
+          console.debug('inuseSpaceMetrics err', err)
+        } else {
+          console.debug('inuseSpaceMetrics resp', response)
+          setGraphData(prevData => {
+            return appendGraphData(prevData, response)
+          })
+        }
+      })
       streams.push(stream)
     }, 1000)
 
@@ -71,7 +69,7 @@ export const HeapGraph: React.FC = () => {
       clearTimeout(t)
       streams.forEach(p => p.cancel())
     }
-  }, [])
+  }, [client])
 
   useEffect(() => {
     const chart = ref.current?.getEchartsInstance()
@@ -107,7 +105,7 @@ export const HeapGraph: React.FC = () => {
       }}
     >
       <ReactECharts
-        key={`${total}`}
+        key={`${total}${flatOrCum}`}
         ref={ref}
         className="p-1 border-2 border-dotted border-default-400 rounded-xl"
         option={po}

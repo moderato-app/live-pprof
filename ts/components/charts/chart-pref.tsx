@@ -3,6 +3,7 @@ import React from 'react'
 import { useSnapshot } from 'valtio/react'
 
 import { GraphPref } from '@/components/state/pref-state'
+import { FlatCumTabs } from '@/components/charts/flat-cum-tabs'
 
 export type ChartPrefProps = {
   graphPrefProxy: GraphPref
@@ -16,6 +17,7 @@ export const ChartPref: React.FC<ChartPrefProps> = ({ graphPrefProxy }) => {
 
   return (
     <div className={'flex gap-1'}>
+      <FlatCumTabs graphPrefProxy={graphPrefProxy} />
       <Checkbox isSelected={total} size="sm" value="Total" onValueChange={setTotal}>
         Total
       </Checkbox>

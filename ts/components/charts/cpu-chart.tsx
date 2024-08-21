@@ -8,7 +8,7 @@ import { useSnapshot } from 'valtio/react'
 
 import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
-import { mockMetricClient } from '@/components/client/metrics'
+import { mockMetricClient, useMetricsClient } from '@/components/client/metrics'
 import { GraphData } from '@/components/charts/data-structure'
 import { appendGraphData } from '@/components/charts/data-operation'
 import { graphPrefsState } from '@/components/state/pref-state'
@@ -28,6 +28,8 @@ export const CPUGraph = () => {
     pprofType: 'CPU',
   })
 
+  const client = useMetricsClient()
+
   useEffect(() => {
     if (ref.current) {
       const instance = ref.current.getEchartsInstance()
@@ -40,7 +42,7 @@ export const CPUGraph = () => {
     const req = new GoMetricsRequest().setUrl('http://localhost:2379/debug/pprof')
     const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
     const t = setInterval(() => {
-      let stream = mockMetricClient.cPUMetrics(req, null, (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
+      let stream = client.cPUMetrics(req, null, (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
         // remove stream from the list
         const index = streams.indexOf(stream)
         if (index > -1) {
@@ -67,7 +69,7 @@ export const CPUGraph = () => {
       clearTimeout(t)
       streams.forEach(p => p.cancel())
     }
-  }, [])
+  }, [client])
 
   useEffect(() => {
     const chart = ref.current?.getEchartsInstance()

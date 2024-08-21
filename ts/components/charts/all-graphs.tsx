@@ -8,6 +8,7 @@ import { ChartPref } from '@/components/charts/chart-pref'
 import { graphPrefsState } from '@/components/state/pref-state'
 import { registerTheme } from 'echarts'
 import darkTheme from '@/components/charts/dark-theme'
+
 registerTheme('dark', darkTheme())
 
 export const AllGraphs: React.FC = () => {
@@ -25,6 +26,7 @@ export const AllGraphs: React.FC = () => {
         }}
       >
         <CPUGraph />
+        <ChartPref graphPrefProxy={graphPrefsState.memory} />
         <HeapGraph />
       </div>
     </div>

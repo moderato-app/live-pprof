@@ -49,10 +49,16 @@ func (m *MetricsServer) CPUMetrics(ctx context.Context, req *api.GoMetricsReques
 	internal.Sugar.Debug("CPUMetrics req:", req)
 	u, err := prepareUrl(req.Url, MetricsTypeCPU)
 	if err != nil {
+		internal.Sugar.Error(err)
 		return nil, err
 	}
 
 	mtr, err := metrics(ctx, u)
+	if err != nil {
+		internal.Sugar.Error(err)
+		return nil, err
+	}
+
 	resp := goMetricsResp(mtr)
 
 	return resp, nil

@@ -6,7 +6,7 @@ import { DatasetComponentOption } from 'echarts/components'
 import { SeriesOption } from 'echarts'
 import _ from 'lodash'
 
-import { GraphPref, graphPrefsState } from '@/components/state/pref-state'
+import { FlatOrCum, GraphPref, graphPrefsState } from '@/components/state/pref-state'
 import { useBasicOption } from '@/components/charts/option/basic-option'
 import { GraphData } from '@/components/charts/data-structure'
 import prettyTime from '@/components/util/prettyTime'
@@ -23,7 +23,7 @@ type PprofProps = {
 export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy, pprofType }): EChartsOption => {
   const fmt = labelFormatter(pprofType)
   const bo = useBasicOption({ labelFormatter: fmt }) as EChartsOption
-  const { total } = useSnapshot(graphPrefProxy)
+  const { total, flatOrCum } = useSnapshot(graphPrefProxy)
   const { smooth } = useSnapshot(graphPrefsState)
 
   const dataset: DatasetComponentOption[] = useMemo(
@@ -53,12 +53,12 @@ export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy
           },
           encode: {
             x: 'date',
-            y: 'flat',
+            y: flatOrCum.toLowerCase(),
             itemName: 'date',
-            tooltip: ['flat'],
+            tooltip: [flatOrCum.toLowerCase()],
           },
         })),
-    [graphData, smooth, total]
+    [graphData, smooth, total, flatOrCum]
   )
 
   return {
@@ -79,25 +79,26 @@ export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy
     },
     tooltip: {
       ...bo.tooltip,
-      formatter: tooltipFormatter,
+      formatter: tooltipFormatter(flatOrCum),
     },
   }
 }
 
-const tooltipFormatter = (params: any[]): string => {
-  params = _.uniqBy(params, p => p.seriesId)
-  let output =
-    `<div class="tooltip"> <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` +
-    '<br/>'
+const tooltipFormatter = (foc: FlatOrCum): ((params: any[]) => string) => {
+  return (params: any[]) => {
+    params = _.uniqBy(params, p => p.seriesId)
+    let output =
+      `<div class="tooltip"> <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` +
+      '<br/>'
 
-  output += '<div class="w-full cursor-pointer select-text">'
+    output += '<div class="w-full cursor-pointer select-text">'
 
-  params.forEach(p => {
-    const value = p.value.flat
-    const splits = p.seriesName.split(' ')
-    const func = splits[0]
-    if (value) {
-      output += `<div class="flex flex-col gap-0.5">
+    params.forEach(p => {
+      const value = p.value[foc.toLowerCase()]
+      const splits = p.seriesName.split(' ')
+      const func = splits[0]
+      if (value) {
+        output += `<div class="flex flex-col gap-0.5">
               <div class="flex flex-col">
                 <div class="flex items-center justify-between gap-8">
                   <div class="flex gap-0.5">
@@ -109,10 +110,11 @@ const tooltipFormatter = (params: any[]): string => {
                 </div>
               </div">              
             </div>`
-    }
-  })
+      }
+    })
 
-  return output + '</div></div>'
+    return output + '</div></div>'
+  }
 }
 
 const labelFormatter = (pprofType: PprofType): ((value: number) => string) => {

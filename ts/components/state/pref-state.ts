@@ -1,26 +1,36 @@
 'use client'
 import { proxy, subscribe } from 'valtio'
 
-const graphsPrefsLSKey = 'graph prefs v11'
+const graphsPrefsLSKey = 'graph prefs v13'
+
+export enum FlatOrCum {
+  flat = 'flat',
+  cum = 'cum',
+}
 
 export type GraphPref = {
   total: boolean
+  flatOrCum: FlatOrCum
 }
 
 const newGraphPref = (): GraphPref => ({
   total: false,
+  flatOrCum: FlatOrCum.flat,
 })
 
 export type GraphPrefs = {
   memory: GraphPref
   cpu: GraphPref
+
   smooth: boolean
+  mock: boolean
 }
 
 const newGraphPrefs = (): GraphPrefs => ({
   memory: newGraphPref(),
   cpu: newGraphPref(),
   smooth: false,
+  mock: false,
 })
 
 const IS_CLIENT = typeof window !== 'undefined'
