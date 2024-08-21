@@ -35,9 +35,11 @@ export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOptio
     }))
   }, [graphData])
 
+  const keys = useMemo(() => Object.keys(graphData.lineTable), [graphData])
+
   const seriesList: SeriesOption[] = useMemo(
     () =>
-      Object.keys(graphData.lineTable)
+      keys
         .filter(key => total || key !== 'total ')
         .map(key => ({
           type: 'line',
@@ -58,7 +60,7 @@ export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOptio
             tooltip: [flatOrCum.toLowerCase()],
           },
         })),
-    [graphData, smooth, total, flatOrCum]
+    [keys, smooth, total, flatOrCum]
   )
   const refreshKey = `${total}+${flatOrCum}`
   const option = {
