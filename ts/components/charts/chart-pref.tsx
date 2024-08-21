@@ -17,7 +17,7 @@ export const ChartPref: React.FC<ChartPrefProps> = ({ graphPrefProxy }) => {
 
   return (
     <div className={'flex gap-1'}>
-      <FlatCumTabs graphPrefProxy={graphPrefProxy} />
+      {/*<FlatCumTabs graphPrefProxy={graphPrefProxy} />*/}
       <Checkbox isSelected={total} size="sm" value="Total" onValueChange={setTotal}>
         Total
       </Checkbox>

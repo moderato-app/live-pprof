@@ -31,11 +31,16 @@ export const CPUGraph = () => {
   const client = useMetricsClient()
 
   useEffect(() => {
-    if (ref.current) {
-      const instance = ref.current.getEchartsInstance()
-      instance.group = 'group1'
-      connect('group1')
+    const instance = ref.current?.getEchartsInstance()
+    if (!instance) {
+      return
     }
+    instance.group = 'group1'
+
+    const t = setTimeout(() => {
+      connect('group1')
+    }, 500)
+    return () => clearTimeout(t)
   }, [ref])
 
   useEffect(() => {

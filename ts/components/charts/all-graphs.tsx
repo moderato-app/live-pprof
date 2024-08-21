@@ -13,22 +13,21 @@ registerTheme('dark', darkTheme())
 
 export const AllGraphs: React.FC = () => {
   return (
-    <div className="flex flex-col h-full w-full gap-2">
+    <div
+      className="flex flex-col h-full w-full overflow-clip"
+      role="presentation"
+      onClick={() => {
+        uiState.freezeTooltip = false
+        window.document.querySelectorAll('.tooltip').forEach(el => {
+          el.parentNode?.childNodes.forEach(c => c.remove())
+        })
+      }}
+    >
       <ChartPref graphPrefProxy={graphPrefsState.cpu} />
-      <div
-        className="flex flex-col gap-10 h-full w-full overflow-clip"
-        role="presentation"
-        onClick={() => {
-          uiState.freezeTooltip = false
-          window.document.querySelectorAll('.tooltip').forEach(el => {
-            el.parentNode?.childNodes.forEach(c => c.remove())
-          })
-        }}
-      >
-        <CPUGraph />
-        <ChartPref graphPrefProxy={graphPrefsState.memory} />
-        <HeapGraph />
-      </div>
+      <CPUGraph />
+      <div className="h-10"></div>
+      <ChartPref graphPrefProxy={graphPrefsState.memory} />
+      <HeapGraph />
     </div>
   )
 }

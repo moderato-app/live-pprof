@@ -16,7 +16,14 @@ export const FlatCumTabs: React.FC<FlatCumTabsProps> = ({ graphPrefProxy }) => {
   }
 
   return (
-    <Tabs aria-label="Options" selectedKey={flatOrCum} size={'sm'} variant={'light'} onSelectionChange={select}>
+    <Tabs
+      aria-label="Options"
+      disabledKeys={[FlatOrCum.cum]}
+      selectedKey={flatOrCum}
+      size={'sm'}
+      variant={'light'}
+      onSelectionChange={select}
+    >
       <Tab key={FlatOrCum.flat} title={FlatOrCum.flat.toUpperCase()} />
       <Tab key={FlatOrCum.cum} title={FlatOrCum.cum.toUpperCase()} />
     </Tabs>
