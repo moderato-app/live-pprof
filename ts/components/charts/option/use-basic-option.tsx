@@ -1,9 +1,10 @@
 'use client'
 import { useTheme } from 'next-themes'
 import { EChartsOption } from 'echarts-for-react/src/types'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
+import { snapshot } from 'valtio'
 
-import { CursorQuadrant, useCursorQuadrant } from '@/components/charts/option/use-cursor-quadrant'
+import { CursorQuadrant, getCursorQuadrant, uiState } from '@/components/state/ui-state'
 
 export type BasicProps = {
   labelFormatter?: (value: number) => string
@@ -11,17 +12,13 @@ export type BasicProps = {
 
 export const useBasicOption: FC<BasicProps> = ({ labelFormatter }): EChartsOption => {
   const theme = useTheme()
-  const cq = useCursorQuadrant()
-  console.info('cq', cq)
-  return useMemo(() => basicOption(theme.resolvedTheme === 'dark', labelFormatter, cq), [cq, theme])
+  return basicOption(theme.resolvedTheme === 'dark', labelFormatter)
 }
 
 export const basicOption = (
   isDark: boolean,
-  labelFormatter: ((value: number) => string) | undefined,
-  cq: CursorQuadrant
+  labelFormatter: ((value: number) => string) | undefined
 ): EChartsOption => {
-  // noinspection JSUnusedGlobalSymbols
   return {
     animationDuration: 0,
     dataZoom: [
@@ -64,6 +61,9 @@ export const basicOption = (
           }
         : null,
       position: function (point: Array<number>, _params: any | Array<any>, dom: HTMLElement, _rect: any, _size: any) {
+        const uiSnap = snapshot(uiState)
+        const cq = getCursorQuadrant(uiSnap.cursorPos.x, uiSnap.cursorPos.y)
+
         switch (cq) {
           case CursorQuadrant.First:
             // place tooltip at left bottom of the pointer

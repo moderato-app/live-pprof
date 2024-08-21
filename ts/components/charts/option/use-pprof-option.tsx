@@ -27,14 +27,13 @@ export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOptio
   const bo = useBasicOption({ labelFormatter: labelFmt }) as EChartsOption
 
   const graphData = useGraphData({ pprofType: pprofType })
-  const dataset: DatasetComponentOption[] = useMemo(
-    () =>
-      Object.keys(graphData.lineTable).map(key => ({
-        id: key,
-        source: graphData.lineTable[key].points,
-      })),
-    [graphData]
-  )
+
+  const dataset: DatasetComponentOption[] = useMemo(() => {
+    return Object.keys(graphData.lineTable).map(key => ({
+      id: key,
+      source: graphData.lineTable[key].points,
+    }))
+  }, [graphData])
 
   const seriesList: SeriesOption[] = useMemo(
     () =>
@@ -99,7 +98,6 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
       it => -it.value[foc.toLowerCase()]
     )
     const tooLong = params.length > 20
-    if (tooLong) params = params.slice(0, 20)
 
     if (!params[0]) {
       return ''
@@ -110,7 +108,7 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
 
     output += '<div class="w-full cursor-pointer select-text">'
 
-    params.forEach(p => {
+    params.slice(0, 20).forEach(p => {
       const value = p.value[foc.toLowerCase()]
       const splits = p.seriesName.split(' ')
       const func = splits[0]
@@ -129,7 +127,7 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
             </div>`
       }
     })
-    if (tooLong) output += '<div>…showing first 20 only…</div>'
+    if (tooLong) output += `<div>…showing 20 of ${params.length}…</div>`
 
     return output + '</div></div>'
   }
