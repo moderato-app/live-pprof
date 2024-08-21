@@ -16,8 +16,10 @@ import (
 type MetricsType int
 
 const (
-	MetricsTypeInuseSpace = MetricsType(iota)
+	MetricsTypeHeap = MetricsType(iota)
 	MetricsTypeCPU
+	MetricsTypeAllocs
+	MetricsTypeGoroutine
 )
 
 type MetricsServer struct {
@@ -28,43 +30,45 @@ func newMetricsServer() *MetricsServer {
 	return &MetricsServer{}
 }
 
-func (m *MetricsServer) InuseSpaceMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
-	internal.Sugar.Debug("InuseSpaceMetrics req:", req)
-	u, err := prepareUrl(req.Url, MetricsTypeInuseSpace)
-	if err != nil {
-		return nil, err
-	}
-
-	mtr, err := metrics(ctx, u)
-	if err != nil {
-		internal.Sugar.Error(err)
-		return nil, err
-	}
-	resp := goMetricsResp(mtr)
-
-	return resp, nil
+func (m *MetricsServer) HeapMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
+	internal.Sugar.Debug("HeapMetrics req:", req)
+	return dispatch(ctx, req, MetricsTypeHeap)
 }
 
 func (m *MetricsServer) CPUMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	internal.Sugar.Debug("CPUMetrics req:", req)
-	u, err := prepareUrl(req.Url, MetricsTypeCPU)
+	return dispatch(ctx, req, MetricsTypeCPU)
+}
+
+func (m *MetricsServer) AllocsMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
+	internal.Sugar.Debug("AllocsMetrics req:", req)
+	return dispatch(ctx, req, MetricsTypeAllocs)
+}
+
+func (m *MetricsServer) GoroutineMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
+	internal.Sugar.Debug("GoroutineMetrics req:", req)
+	return dispatch(ctx, req, MetricsTypeGoroutine)
+}
+
+func dispatch(ctx context.Context, req *api.GoMetricsRequest, mt MetricsType) (*api.GoMetricsResponse, error) {
+	u, err := prepareUrl(req.Url, mt)
 	if err != nil {
 		internal.Sugar.Error(err)
 		return nil, err
 	}
 
-	mtr, err := metrics(ctx, u)
+	mtr, err := fetch(ctx, u)
 	if err != nil {
 		internal.Sugar.Error(err)
 		return nil, err
 	}
 
-	resp := goMetricsResp(mtr)
+	resp := toResp(mtr)
 
 	return resp, nil
 }
 
-func metrics(ctx context.Context, url string) (*moderato.Metrics, error) {
+func fetch(ctx context.Context, url string) (*moderato.Metrics, error) {
 
 	client := &http.Client{}
 	internal.Sugar.Debugf("GET %s", url)
@@ -102,8 +106,12 @@ func prepareUrl(baseUrl string, mt MetricsType) (string, error) {
 	}
 
 	var u string
-	if mt == MetricsTypeInuseSpace {
+	if mt == MetricsTypeHeap {
 		u = parse.JoinPath("heap").String()
+	} else if mt == MetricsTypeAllocs {
+		u = parse.JoinPath("allocs").String()
+	} else if mt == MetricsTypeGoroutine {
+		u = parse.JoinPath("goroutine").String()
 	} else if mt == MetricsTypeCPU {
 		j := parse.JoinPath("profile")
 		params := url.Values{}
@@ -111,12 +119,12 @@ func prepareUrl(baseUrl string, mt MetricsType) (string, error) {
 		j.RawQuery = params.Encode()
 		u = j.String()
 	} else {
-		return "", errors.New("invalid metrics type")
+		return "", errors.New("invalid fetch type")
 	}
 	return u, nil
 }
 
-func goMetricsResp(mtr *moderato.Metrics) *api.GoMetricsResponse {
+func toResp(mtr *moderato.Metrics) *api.GoMetricsResponse {
 	var pbItems []*api.Item
 
 	pbItems = append(pbItems, &api.Item{

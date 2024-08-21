@@ -20,32 +20,38 @@ func newMockMetricsServer() *MockMetricsServer {
 	}
 }
 
-func (m *MockMetricsServer) InuseSpaceMetrics(_ context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
-	internal.Sugar.Debug("InuseSpaceMetrics req:", req)
-	_, err := prepareUrl(req.Url, MetricsTypeInuseSpace)
-	if err != nil {
-		return nil, err
-	}
-
-	mtr, err := m.mockResources.GetMetrics(MetricsTypeInuseSpace)
-	if err != nil {
-		internal.Sugar.Error(err)
-		return nil, err
-	}
-	resp := goMetricsResp(mtr)
-
-	return resp, nil
+func (m *MockMetricsServer) HeapMetrics(_ context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
+	internal.Sugar.Debug("HeapMetrics req:", req)
+	return m.dispatch(req, MetricsTypeHeap)
 }
 
 func (m *MockMetricsServer) CPUMetrics(_ context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	internal.Sugar.Debug("CPUMetrics req:", req)
-	_, err := prepareUrl(req.Url, MetricsTypeCPU)
+	return m.dispatch(req, MetricsTypeCPU)
+}
+
+func (m *MockMetricsServer) AllocsMetrics(_ context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
+	internal.Sugar.Debug("AllocsMetrics req:", req)
+	return m.dispatch(req, MetricsTypeAllocs)
+}
+
+func (m *MockMetricsServer) GoroutineMetrics(_ context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
+	internal.Sugar.Debug("GoroutineMetrics req:", req)
+	return m.dispatch(req, MetricsTypeGoroutine)
+}
+
+func (m *MockMetricsServer) dispatch(req *api.GoMetricsRequest, mt MetricsType) (*api.GoMetricsResponse, error) {
+	_, err := prepareUrl(req.Url, mt)
 	if err != nil {
 		return nil, err
 	}
 
-	mtr, err := m.mockResources.GetMetrics(MetricsTypeCPU)
-	resp := goMetricsResp(mtr)
+	mtr, err := m.mockResources.GetMetrics(mt)
+	if err != nil {
+		internal.Sugar.Error(err)
+		return nil, err
+	}
+	resp := toResp(mtr)
 
 	return resp, nil
 }

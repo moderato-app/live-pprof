@@ -5,3 +5,8 @@ rm -rf default.etcd &&  etcd --enable-pprof
 while true ; do go tool pprof -text http://localhost:2379/debug/pprof/profile\?seconds\=1; done
 
 while true ; do go tool pprof -text http://localhost:2379/debug/pprof/heap && sleep 1 ;done
+
+
+while true ; do go tool pprof -text http://localhost:2379/debug/pprof/allocs && sleep 1 ;done
+
+while true ; do go tool pprof -text http://localhost:2379/debug/pprof/goroutine && sleep 1 ;done

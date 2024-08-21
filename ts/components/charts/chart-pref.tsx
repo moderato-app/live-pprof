@@ -3,7 +3,6 @@ import React from 'react'
 import { useSnapshot } from 'valtio/react'
 
 import { GraphPref } from '@/components/state/pref-state'
-import { FlatCumTabs } from '@/components/charts/flat-cum-tabs'
 
 export type ChartPrefProps = {
   graphPrefProxy: GraphPref

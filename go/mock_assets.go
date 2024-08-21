@@ -58,12 +58,12 @@ func (m *MockAssets) GetMetrics(mt MetricsType) (*moderato.Metrics, error) {
 
 	cnt := m.mockCount.Add(1)
 	var profile []byte
-	if mt == MetricsTypeInuseSpace {
+	if mt == MetricsTypeHeap {
 		profile = m.heapProfiles[cnt%int64(len(m.cpuProfiles))]
 	} else if mt == MetricsTypeCPU {
 		profile = m.cpuProfiles[cnt%int64(len(m.cpuProfiles))]
 	} else {
-		return nil, errors.New("invalid metrics type")
+		return nil, errors.New("invalid fetch type")
 	}
 
 	mtr, err := moderato.GetMetricsFromData(profile)

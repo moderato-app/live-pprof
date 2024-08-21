@@ -1,17 +1,18 @@
 import prettyBytes from 'pretty-bytes'
 import { useSnapshot } from 'valtio/react'
 import { EChartsOption } from 'echarts-for-react/src/types'
-import { FC, useMemo } from 'react'
+import { FC, useCallback, useMemo } from 'react'
 import { DatasetComponentOption } from 'echarts/components'
 import { SeriesOption } from 'echarts'
 import _ from 'lodash'
 
+import { uiState } from '@/components/state/ui-state'
 import { FlatOrCum, GraphPref, graphPrefsState } from '@/components/state/pref-state'
 import { useBasicOption } from '@/components/charts/option/basic-option'
 import { GraphData } from '@/components/charts/data-structure'
 import prettyTime from '@/components/util/prettyTime'
 
-export type PprofType = 'CPU' | 'Memory'
+export type PprofType = 'CPU' | 'Heap'
 
 type PprofProps = {
   name: string
@@ -21,10 +22,13 @@ type PprofProps = {
 }
 
 export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy, pprofType }): EChartsOption => {
-  const fmt = labelFormatter(pprofType)
-  const bo = useBasicOption({ labelFormatter: fmt }) as EChartsOption
   const { total, flatOrCum } = useSnapshot(graphPrefProxy)
   const { smooth } = useSnapshot(graphPrefsState)
+
+  const labelFmt = useCallback(labelFormatter(pprofType), [pprofType])
+  const tooltipFmt = useCallback(tooltipFormatter(flatOrCum, labelFmt), [flatOrCum, labelFmt])
+
+  const bo = useBasicOption({ labelFormatter: labelFmt }) as EChartsOption
 
   const dataset: DatasetComponentOption[] = useMemo(
     () =>
@@ -74,19 +78,30 @@ export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy
     },
     yAxis: {
       axisLabel: {
-        formatter: fmt,
+        formatter: labelFmt,
       },
     },
     tooltip: {
       ...bo.tooltip,
-      formatter: tooltipFormatter(flatOrCum),
+      formatter: tooltipFmt,
     },
   }
 }
 
-const tooltipFormatter = (foc: FlatOrCum): ((params: any[]) => string) => {
+const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): ((params: any[]) => string) => {
   return (params: any[]) => {
-    params = _.uniqBy(params, p => p.seriesId)
+    uiState.hoveringDate = params[0]?.data?.date
+
+    params = _.sortBy(
+      _.uniqBy(
+        params.filter(it => it.value[foc.toLowerCase()] !== undefined),
+        it => it.seriesId
+      ),
+      it => -it.value[foc.toLowerCase()]
+    )
+    if (!params[0]) {
+      return ''
+    }
     let output =
       `<div class="tooltip"> <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` +
       '<br/>'
@@ -106,7 +121,7 @@ const tooltipFormatter = (foc: FlatOrCum): ((params: any[]) => string) => {
                     <span class="text-default-600 text-center">${func}</span>
                   </div>
   
-                  <div class="font-bold text-default-600">${prettyBytes(value)}</div>
+                  <div class="font-bold text-default-600">${labelFmt(value)}</div>
                 </div>
               </div">              
             </div>`
@@ -118,7 +133,7 @@ const tooltipFormatter = (foc: FlatOrCum): ((params: any[]) => string) => {
 }
 
 const labelFormatter = (pprofType: PprofType): ((value: number) => string) => {
-  if (pprofType === 'Memory') {
+  if (pprofType === 'Heap') {
     return (value: number) => (isNaN(value) ? '' : prettyBytes(value))
   } else if (pprofType === 'CPU') {
     return (value: number) => (isNaN(value) ? '' : prettyTime(value / 1e6))

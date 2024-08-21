@@ -1,9 +1,6 @@
 import { useTheme } from 'next-themes'
-import { useSnapshot } from 'valtio/react'
 import { EChartsOption } from 'echarts-for-react/src/types'
 import { FC } from 'react'
-
-import { uiState } from '@/components/state/ui-state'
 
 export type BasicProps = {
   labelFormatter?: (value: number) => string
@@ -11,16 +8,11 @@ export type BasicProps = {
 
 export const useBasicOption: FC<BasicProps> = ({ labelFormatter }): EChartsOption => {
   const theme = useTheme()
-  const { freezeTooltip } = useSnapshot(uiState)
 
-  return basicOption(theme.resolvedTheme === 'dark', freezeTooltip, labelFormatter)
+  return basicOption(theme.resolvedTheme === 'dark', labelFormatter)
 }
 
-export const basicOption = (
-  isDark: boolean,
-  freezeTooltip: boolean,
-  labelFormatter?: (value: number) => string
-): EChartsOption => {
+export const basicOption = (isDark: boolean, labelFormatter?: (value: number) => string): EChartsOption => {
   // noinspection JSUnusedGlobalSymbols
   return {
     animationDuration: 0,
@@ -55,9 +47,7 @@ export const basicOption = (
     tooltip: {
       order: 'valueDesc',
       trigger: 'axis',
-      alwaysShowContent: freezeTooltip,
-      enterable: true,
-      triggerOn: freezeTooltip ? 'click' : 'mousemove|click',
+      triggerOn: 'mousemove',
       // valueFormatter: function (value: number | string, _dataIndex: number): string | undefined {
       //   if (typeof value === 'number' && value) {
       //     return prettyBytes(value as number)

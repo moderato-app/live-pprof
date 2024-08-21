@@ -3,6 +3,7 @@ import { proxy } from 'valtio'
 
 type UI = {
   freezeTooltip: boolean
+  hoveringDate?: Date
 }
 
 const newUI = (): UI => ({

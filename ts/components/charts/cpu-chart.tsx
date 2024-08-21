@@ -1,6 +1,5 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
-import { connect } from 'echarts'
 import { useTheme } from 'next-themes'
 import grpcWeb from 'grpc-web'
 import ReactECharts from 'echarts-for-react'
@@ -8,7 +7,7 @@ import { useSnapshot } from 'valtio/react'
 
 import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
-import { mockMetricClient, useMetricsClient } from '@/components/client/metrics'
+import { useMetricsClient } from '@/components/client/metrics'
 import { GraphData } from '@/components/charts/data-structure'
 import { appendGraphData } from '@/components/charts/data-operation'
 import { graphPrefsState } from '@/components/state/pref-state'
@@ -29,19 +28,6 @@ export const CPUGraph = () => {
   })
 
   const client = useMetricsClient()
-
-  useEffect(() => {
-    const instance = ref.current?.getEchartsInstance()
-    if (!instance) {
-      return
-    }
-    instance.group = 'group1'
-
-    const t = setTimeout(() => {
-      connect('group1')
-    }, 500)
-    return () => clearTimeout(t)
-  }, [ref])
 
   useEffect(() => {
     const req = new GoMetricsRequest().setUrl('http://localhost:2379/debug/pprof')

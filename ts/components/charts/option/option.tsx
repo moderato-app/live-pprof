@@ -100,7 +100,7 @@ export function option(
       trigger: 'axis',
       alwaysShowContent: freezeTooltip,
       // hideDelay: 10_000,
-      enterable: true,
+      // enterable: true,
       // triggerOn: 'click',
       triggerOn: freezeTooltip ? 'click' : 'mousemove|click',
       // https://github.com/apache/echarts/issues/9763#issuecomment-1446643093
