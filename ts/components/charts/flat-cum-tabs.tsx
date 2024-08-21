@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import { useSnapshot } from 'valtio/react'
 import { Tab, Tabs } from '@nextui-org/tabs'

@@ -1,3 +1,4 @@
+'use client'
 export type Point = {
   date: Date
   flat: number | undefined
@@ -15,3 +16,5 @@ export type GraphData = {
   lineTable: LineTable
   dates: Date[]
 }
+
+export const newGraphData = (): GraphData => ({ lineTable: {}, dates: [] })

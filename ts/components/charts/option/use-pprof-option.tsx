@@ -1,28 +1,24 @@
+'use client'
 import prettyBytes from 'pretty-bytes'
 import { useSnapshot } from 'valtio/react'
 import { EChartsOption } from 'echarts-for-react/src/types'
-import { FC, useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { DatasetComponentOption } from 'echarts/components'
 import { SeriesOption } from 'echarts'
 import _ from 'lodash'
 
 import { uiState } from '@/components/state/ui-state'
-import { FlatOrCum, GraphPref, graphPrefsState } from '@/components/state/pref-state'
-import { useBasicOption } from '@/components/charts/option/basic-option'
-import { GraphData } from '@/components/charts/data-structure'
+import { dispatchGraphPrefProxy, FlatOrCum, graphPrefsState } from '@/components/state/pref-state'
+import { useBasicOption } from '@/components/charts/option/use-basic-option'
 import prettyTime from '@/components/util/prettyTime'
-
-export type PprofType = 'CPU' | 'Heap'
+import { PprofType, useGraphData } from '@/components/charts/option/use-graph-data'
 
 type PprofProps = {
-  name: string
-  graphData: GraphData
-  graphPrefProxy: GraphPref
   pprofType: PprofType
 }
 
-export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy, pprofType }): EChartsOption => {
-  const { total, flatOrCum } = useSnapshot(graphPrefProxy)
+export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOption, refreshKey: string] => {
+  const { total, flatOrCum } = useSnapshot(dispatchGraphPrefProxy(pprofType))
   const { smooth } = useSnapshot(graphPrefsState)
 
   const labelFmt = useCallback(labelFormatter(pprofType), [pprofType])
@@ -30,6 +26,7 @@ export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy
 
   const bo = useBasicOption({ labelFormatter: labelFmt }) as EChartsOption
 
+  const graphData = useGraphData({ pprofType: pprofType })
   const dataset: DatasetComponentOption[] = useMemo(
     () =>
       Object.keys(graphData.lineTable).map(key => ({
@@ -64,11 +61,11 @@ export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy
         })),
     [graphData, smooth, total, flatOrCum]
   )
-
-  return {
+  const refreshKey = `${total}+${flatOrCum}`
+  const option = {
     ...bo,
     title: {
-      text: name,
+      text: pprofType,
     },
     dataset: dataset,
     series: seriesList,
@@ -86,6 +83,8 @@ export const usePprofOption: FC<PprofProps> = ({ name, graphData, graphPrefProxy
       formatter: tooltipFmt,
     },
   }
+
+  return [option, refreshKey]
 }
 
 const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): ((params: any[]) => string) => {
@@ -99,6 +98,9 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
       ),
       it => -it.value[foc.toLowerCase()]
     )
+    const tooLong = params.length > 20
+    if (tooLong) params = params.slice(0, 20)
+
     if (!params[0]) {
       return ''
     }
@@ -127,17 +129,20 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
             </div>`
       }
     })
+    if (tooLong) output += '<div>…showing first 20 only…</div>'
 
     return output + '</div></div>'
   }
 }
 
 const labelFormatter = (pprofType: PprofType): ((value: number) => string) => {
-  if (pprofType === 'Heap') {
-    return (value: number) => (isNaN(value) ? '' : prettyBytes(value))
-  } else if (pprofType === 'CPU') {
-    return (value: number) => (isNaN(value) ? '' : prettyTime(value / 1e6))
-  } else {
-    throw new Error('Invalid pprof type', pprofType)
+  switch (pprofType) {
+    case PprofType.cpu:
+      return (value: number) => (isNaN(value) ? '' : prettyTime(value / 1e6))
+    case PprofType.allocs:
+    case PprofType.heap:
+      return (value: number) => (isNaN(value) ? '' : prettyBytes(value))
+    case PprofType.goroutine:
+      return (value: number) => (isNaN(value) ? '' : `${value}`)
   }
 }

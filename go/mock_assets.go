@@ -17,12 +17,16 @@ var assets embed.FS
 
 const cpuDir = "assets/mock-data/cpu"
 const heap = "assets/mock-data/heap"
+const allocs = "assets/mock-data/allocs"
+const goroutine = "assets/mock-data/goroutine"
 
 type MockAssets struct {
-	loadProfilesOnce func()
-	cpuProfiles      [][]byte
-	heapProfiles     [][]byte
-	mockCount        atomic.Int64
+	loadProfilesOnce  func()
+	cpuProfiles       [][]byte
+	heapProfiles      [][]byte
+	allocsProfiles    [][]byte
+	goroutineProfiles [][]byte
+	mockCount         atomic.Int64
 }
 
 func newMockAssets() *MockAssets {
@@ -48,6 +52,26 @@ func newMockAssets() *MockAssets {
 		if len(m.heapProfiles) == 0 {
 			panic("no files at " + heap)
 		}
+
+		err = walkDirNonRecursive(allocs, func(data []byte) {
+			m.allocsProfiles = append(m.allocsProfiles, data)
+		})
+		if err != nil {
+			panic(err)
+		}
+		if len(m.allocsProfiles) == 0 {
+			panic("no files at " + allocs)
+		}
+
+		err = walkDirNonRecursive(goroutine, func(data []byte) {
+			m.goroutineProfiles = append(m.goroutineProfiles, data)
+		})
+		if err != nil {
+			panic(err)
+		}
+		if len(m.goroutineProfiles) == 0 {
+			panic("no files at " + goroutine)
+		}
 	})
 	return m
 }
@@ -62,6 +86,10 @@ func (m *MockAssets) GetMetrics(mt MetricsType) (*moderato.Metrics, error) {
 		profile = m.heapProfiles[cnt%int64(len(m.cpuProfiles))]
 	} else if mt == MetricsTypeCPU {
 		profile = m.cpuProfiles[cnt%int64(len(m.cpuProfiles))]
+	} else if mt == MetricsTypeAllocs {
+		profile = m.allocsProfiles[cnt%int64(len(m.allocsProfiles))]
+	} else if mt == MetricsTypeGoroutine {
+		profile = m.goroutineProfiles[cnt%int64(len(m.goroutineProfiles))]
 	} else {
 		return nil, errors.New("invalid fetch type")
 	}

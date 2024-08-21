@@ -9,7 +9,6 @@ import { useIsSSR } from '@react-aria/ssr'
 import { Tooltip } from '@nextui-org/tooltip'
 
 import { graphPrefsState } from '@/components/state/pref-state'
-import { CurveIcon } from '@/components/icons'
 
 export interface ThemeSwitchProps {
   className?: string

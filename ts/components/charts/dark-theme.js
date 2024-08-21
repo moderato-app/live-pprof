@@ -1,3 +1,4 @@
+'use client'
 export default function darkTheme() {
   var contrastColor = '#B9B8CE'
   var backgroundColor = '#100C2A'

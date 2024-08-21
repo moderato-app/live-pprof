@@ -1,17 +1,19 @@
+'use client'
 import { Checkbox } from '@nextui-org/checkbox'
 import React from 'react'
 import { useSnapshot } from 'valtio/react'
 
-import { GraphPref } from '@/components/state/pref-state'
+import { dispatchGraphPrefProxy } from '@/components/state/pref-state'
+import { PprofType } from '@/components/charts/option/use-graph-data'
 
 export type ChartPrefProps = {
-  graphPrefProxy: GraphPref
+  pprofType: PprofType
 }
 
-export const ChartPref: React.FC<ChartPrefProps> = ({ graphPrefProxy }) => {
-  const { total } = useSnapshot(graphPrefProxy)
+export const ChartPref: React.FC<ChartPrefProps> = ({ pprofType }) => {
+  const { total } = useSnapshot(dispatchGraphPrefProxy(pprofType))
   const setTotal = (total: boolean) => {
-    graphPrefProxy.total = total
+    dispatchGraphPrefProxy(pprofType).total = total
   }
 
   return (

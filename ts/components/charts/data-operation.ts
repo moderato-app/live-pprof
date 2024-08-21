@@ -1,3 +1,4 @@
+'use client'
 import { GraphData, Point } from '@/components/charts/data-structure'
 import { GoMetricsResponse, Item } from '@/components/api/api_pb'
 import { convertUnixNanoToDate } from '@/components/util/util'

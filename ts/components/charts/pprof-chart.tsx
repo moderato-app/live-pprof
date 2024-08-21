@@ -1,12 +1,16 @@
 'use client'
-import React from 'react'
+import React, { FC } from 'react'
 
 import { PprofType } from '@/components/charts/option/use-graph-data'
 import { BasicGraph } from '@/components/charts/basic-graph'
 import { usePprofOption } from '@/components/charts/option/use-pprof-option'
 
-export const CPUGraph = () => {
-  let [option, refreshKey] = usePprofOption({ pprofType: PprofType.cpu })
+type PprofGraphProps = {
+  pprofType: PprofType
+}
+
+export const PprofGraph: FC<PprofGraphProps> = ({ pprofType }) => {
+  let [option, refreshKey] = usePprofOption({ pprofType: pprofType })
 
   return <BasicGraph option={option} refreshKey={refreshKey} />
 }
