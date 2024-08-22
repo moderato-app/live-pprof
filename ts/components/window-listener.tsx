@@ -5,9 +5,7 @@ import { useIsSSR } from '@react-aria/ssr'
 import { uiState } from '@/components/state/ui-state'
 
 export const useWindowListener = () => {
-  if (useIsSSR()) {
-    return null
-  }
+  const ssr = useIsSSR()
 
   const handleMouseMove = (event: MouseEvent) => {
     uiState.cursorPos = {
@@ -17,12 +15,13 @@ export const useWindowListener = () => {
   }
 
   useEffect(() => {
+    if (ssr) return
     window.addEventListener('mousemove', handleMouseMove)
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
     }
-  }, [])
+  }, [ssr])
 
   return null
 }

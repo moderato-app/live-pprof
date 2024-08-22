@@ -7,10 +7,11 @@ import { usePprofOption } from '@/components/charts/option/use-pprof-option'
 
 type PprofGraphProps = {
   pprofType: PprofType
+  className?: string
 }
 
-export const PprofGraph: FC<PprofGraphProps> = ({ pprofType }) => {
+export const PprofGraph: FC<PprofGraphProps> = ({ pprofType, className }) => {
   let [option, refreshKey] = usePprofOption({ pprofType: pprofType })
 
-  return <BasicGraph option={option} refreshKey={refreshKey} />
+  return <BasicGraph className={className} option={option} refreshKey={refreshKey} />
 }
