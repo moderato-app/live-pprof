@@ -5,7 +5,7 @@ import { useIsSSR } from '@react-aria/ssr'
 
 import { ChartPref } from '@/components/charts/chart-pref'
 import darkTheme from '@/components/charts/dark-theme'
-import { PprofType } from '@/components/charts/option/use-graph-data'
+import { PprofType } from '@/components/hooks/use-graph-data'
 import { PprofGraph } from '@/components/charts/pprof-chart'
 import { useWindowListener } from '@/components/window-listener'
 

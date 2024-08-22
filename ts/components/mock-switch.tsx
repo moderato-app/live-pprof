@@ -9,6 +9,7 @@ import { useIsSSR } from '@react-aria/ssr'
 import { Tooltip } from '@nextui-org/tooltip'
 
 import { graphPrefsState } from '@/components/state/pref-state'
+import { useIsDev } from '@/components/hooks/use-is-dev'
 
 export interface ThemeSwitchProps {
   className?: string
@@ -17,8 +18,8 @@ export interface ThemeSwitchProps {
 
 export const MockSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) => {
   const { mock } = useSnapshot(graphPrefsState)
-  const ssr = useIsSSR()
-  if (ssr) {
+  const isDev = useIsDev()
+  if (useIsSSR() || !isDev) {
     return null
   }
 

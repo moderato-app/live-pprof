@@ -5,7 +5,7 @@ import { useSnapshot } from 'valtio/react'
 import clsx from 'clsx'
 
 import { dispatchGraphPrefProxy } from '@/components/state/pref-state'
-import { PprofType } from '@/components/charts/option/use-graph-data'
+import { PprofType } from '@/components/hooks/use-graph-data'
 
 export type ChartPrefProps = {
   pprofType: PprofType

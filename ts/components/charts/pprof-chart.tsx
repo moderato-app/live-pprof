@@ -1,9 +1,9 @@
 'use client'
 import React, { FC } from 'react'
 
-import { PprofType } from '@/components/charts/option/use-graph-data'
+import { PprofType } from '@/components/hooks/use-graph-data'
 import { BasicGraph } from '@/components/charts/basic-graph'
-import { usePprofOption } from '@/components/charts/option/use-pprof-option'
+import { usePprofOption } from '@/components/hooks/use-pprof-option'
 
 type PprofGraphProps = {
   pprofType: PprofType

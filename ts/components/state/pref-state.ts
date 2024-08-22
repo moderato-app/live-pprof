@@ -1,9 +1,9 @@
 'use client'
 import { proxy, subscribe } from 'valtio'
 
-import { PprofType } from '@/components/charts/option/use-graph-data'
+import { PprofType } from '@/components/hooks/use-graph-data'
 
-const graphsPrefsLSKey = 'graph prefs v16'
+const graphsPrefsLSKey = 'graph prefs v17'
 
 export enum FlatOrCum {
   flat = 'flat',

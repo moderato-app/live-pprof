@@ -9,9 +9,9 @@ import _ from 'lodash'
 
 import { uiState } from '@/components/state/ui-state'
 import { dispatchGraphPrefProxy, FlatOrCum, graphPrefsState } from '@/components/state/pref-state'
-import { useBasicOption } from '@/components/charts/option/use-basic-option'
+import { useBasicOption } from '@/components/hooks/use-basic-option'
 import prettyTime from '@/components/util/prettyTime'
-import { PprofType, useGraphData } from '@/components/charts/option/use-graph-data'
+import { PprofType, useGraphData } from '@/components/hooks/use-graph-data'
 
 type PprofProps = {
   pprofType: PprofType
