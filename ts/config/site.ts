@@ -8,10 +8,10 @@ export const siteConfig = {
       label: 'Home',
       href: '/',
     },
-    // {
-    //   label: 'About',
-    //   href: '/about',
-    // },
+    {
+      label: 'About',
+      href: '/about',
+    },
   ],
   links: {
     github: 'https://github.com/moderato-app/live-pprof',

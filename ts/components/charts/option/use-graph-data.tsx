@@ -1,12 +1,14 @@
 'use client'
 import { useEffect, useState } from 'react'
 import grpcWeb from 'grpc-web'
+import { useSnapshot } from 'valtio/react'
 
 import { GraphData, newGraphData } from '@/components/charts/data-structure'
 import { useMetricsClient } from '@/components/client/metrics'
 import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
 import { appendGraphData } from '@/components/charts/data-operation'
+import { recorderState } from '@/components/state/recorder-state'
 
 export enum PprofType {
   cpu = 'CPU',
@@ -19,14 +21,14 @@ export type GraphDataProps = {
   pprofType: PprofType
 }
 
-const basicUrl = 'http://localhost:2379/debug/pprof'
-
 export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
   const [graphData, setGraphData] = useState<GraphData>(newGraphData())
   const client = useMetricsClient()
+  const { basicURL, isRecording } = useSnapshot(recorderState)
 
   useEffect(() => {
-    const req = new GoMetricsRequest().setUrl(basicUrl)
+    if (!isRecording) return
+    const req = new GoMetricsRequest().setUrl(basicURL)
     const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
     const t = setInterval(() => {
       const callback = (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
@@ -72,7 +74,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
       clearTimeout(t)
       streams.forEach(p => p.cancel())
     }
-  }, [client])
+  }, [client, isRecording, basicURL])
 
   return graphData
 }

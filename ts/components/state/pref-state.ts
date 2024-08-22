@@ -3,7 +3,7 @@ import { proxy, subscribe } from 'valtio'
 
 import { PprofType } from '@/components/charts/option/use-graph-data'
 
-const graphsPrefsLSKey = 'graph prefs v14'
+const graphsPrefsLSKey = 'graph prefs v16'
 
 export enum FlatOrCum {
   flat = 'flat',
