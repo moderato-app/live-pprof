@@ -5,12 +5,25 @@ import { convertUnixNanoToDate } from '@/components/util/util'
 
 const getKey = (item: Item): string => item.getFunc() + ' ' + item.getLine()
 
-export function appendGraphData(graphData: GraphData, rsp: GoMetricsResponse): GraphData {
+export function appendGraphData(graphData: GraphData, rsp: GoMetricsResponse, maxSamples?: number): GraphData {
   let date = convertUnixNanoToDate(rsp.getDate())
 
   let items = rsp.getItemsList().filter(item => item.getFlat() > 0)
 
   graphData.dates.push(date)
+
+  const count = graphData.dates.length
+
+  if (maxSamples && maxSamples > 0 && count > maxSamples) {
+    const datesToDelete = graphData.dates.splice(0, count - maxSamples)
+    datesToDelete.forEach(d =>
+      Object.keys(graphData.lineTable).forEach(key => {
+        const line = graphData.lineTable[key]
+        line.points = line.points.filter(p => p.date !== d)
+      })
+    )
+  }
+
   for (let key in graphData.lineTable) {
     graphData.lineTable[key].points.push({
       date: date,

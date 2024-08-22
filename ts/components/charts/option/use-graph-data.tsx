@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import grpcWeb from 'grpc-web'
 
 import { GraphData, newGraphData } from '@/components/charts/data-structure'

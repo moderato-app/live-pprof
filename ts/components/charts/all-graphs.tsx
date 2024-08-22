@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { registerTheme } from 'echarts'
+import { useIsSSR } from '@react-aria/ssr'
 
 import { ChartPref } from '@/components/charts/chart-pref'
 import darkTheme from '@/components/charts/dark-theme'
@@ -12,7 +13,6 @@ registerTheme('dark', darkTheme())
 
 export const AllGraphs: React.FC = () => {
   useWindowListener()
-
   return (
     <div className="flex flex-row flex-wrap justify-between h-full w-full pb-2 overflow-clip">
       <div className="flex flex-col basis-[49%] h-[50%]">
