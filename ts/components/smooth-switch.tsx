@@ -24,7 +24,7 @@ export const SmoothSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) =>
   }
 
   return (
-    <Tooltip closeDelay={0} content={`Smooth Chart Lines`} delay={500}>
+    <Tooltip className="bg-default-200" closeDelay={0} content={`Smooth Chart Lines`} delay={500}>
       <Switch
         className={clsx('', className, classNames?.base)}
         color="success"

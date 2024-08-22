@@ -9,6 +9,7 @@ import { SmoothSwitch } from '@/components/smooth-switch'
 import { MockSwitch } from '@/components/mock-switch'
 import { RecorderButton } from '@/components/recorder-button'
 import { RecorderTime } from '@/components/recorder-time'
+import { HomeMenu } from '@/components/home-menu'
 
 export const Navbar = () => {
   return (
@@ -22,6 +23,7 @@ export const Navbar = () => {
         <ul className="flex justify-center items-center gap-1">
           <RecorderButton />
           <RecorderTime />
+          <HomeMenu />
         </ul>
       </NavbarContent>
 

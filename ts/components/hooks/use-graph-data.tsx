@@ -9,6 +9,7 @@ import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
 import { appendGraphData } from '@/components/charts/data-operation'
 import { recorderState } from '@/components/state/recorder-state'
+import { myEmitter } from '@/components/state/emitter'
 
 export enum PprofType {
   cpu = 'CPU',
@@ -25,6 +26,14 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
   const [graphData, setGraphData] = useState<GraphData>(newGraphData())
   const client = useMetricsClient()
   const { basicURL, isRecording } = useSnapshot(recorderState)
+
+  useEffect(() => {
+    const clearData = () => {
+      setGraphData(newGraphData())
+    }
+    myEmitter.on('clearData', clearData)
+    return () => myEmitter.on('clearData', clearData)
+  }, [setGraphData])
 
   useEffect(() => {
     if (!isRecording) return

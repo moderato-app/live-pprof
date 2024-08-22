@@ -21,12 +21,12 @@ export const RecorderButton = () => {
   }, [])
 
   return (
-    <Tooltip closeDelay={0} content={tooltipInfo} delay={500}>
+    <Tooltip className="bg-default-200" closeDelay={0} content={tooltipInfo} delay={500}>
       {isRecording ? (
         <Button
           isIconOnly
           aria-label={tooltipInfo}
-          className="text-default-600 dark:text-default-foreground"
+          className="text-default-500 dark:text-default-foreground"
           variant={'light'}
           onPress={stop}
         >
@@ -36,7 +36,7 @@ export const RecorderButton = () => {
         <Button
           isIconOnly
           aria-label={tooltipInfo}
-          className="text-default-600 dark:text-default-foreground"
+          className="text-default-500 dark:text-default-foreground"
           variant={'light'}
           onPress={start}
         >

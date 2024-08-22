@@ -2,7 +2,7 @@
 import prettyBytes from 'pretty-bytes'
 import { useSnapshot } from 'valtio/react'
 import { EChartsOption } from 'echarts-for-react/src/types'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DatasetComponentOption } from 'echarts/components'
 import { SeriesOption } from 'echarts'
 import _ from 'lodash'
@@ -12,6 +12,8 @@ import { dispatchGraphPrefProxy, FlatOrCum, graphPrefsState } from '@/components
 import { useBasicOption } from '@/components/hooks/use-basic-option'
 import prettyTime from '@/components/util/prettyTime'
 import { PprofType, useGraphData } from '@/components/hooks/use-graph-data'
+import { newGraphData } from '@/components/charts/data-structure'
+import { myEmitter } from '@/components/state/emitter'
 
 type PprofProps = {
   pprofType: PprofType
@@ -27,6 +29,14 @@ export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOptio
   const bo = useBasicOption({ labelFormatter: labelFmt }) as EChartsOption
 
   const graphData = useGraphData({ pprofType: pprofType })
+
+  const [clearCount, setClearCount] = useState(0)
+
+  useEffect(() => {
+    const incr = () => setClearCount(count => count + 1)
+    myEmitter.on('clearData', incr)
+    return () => myEmitter.on('clearData', incr)
+  }, [])
 
   const dataset: DatasetComponentOption[] = useMemo(() => {
     return Object.keys(graphData.lineTable).map(key => ({
@@ -62,7 +72,8 @@ export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOptio
         })),
     [keys, smooth, total, flatOrCum]
   )
-  const refreshKey = `${total}+${flatOrCum}`
+
+  const refreshKey = `${total}+${flatOrCum}+${clearCount}`
   const option = {
     ...bo,
     title: {
