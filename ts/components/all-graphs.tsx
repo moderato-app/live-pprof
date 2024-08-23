@@ -9,6 +9,7 @@ import { PprofType } from '@/components/hooks/use-graph-data'
 import { PprofGraph } from '@/components/charts/pprof-chart'
 import { useWindowListener } from '@/components/window-listener'
 import { useGraphPrefSnap } from '@/components/hooks/use-graph-pref-snap'
+registerTheme('dark', darkTheme())
 
 export const AllGraphs: React.FC = () => {
   const ssr = useIsSSR()
@@ -22,7 +23,6 @@ export const AllGraphs: React.FC = () => {
 
   useEffect(() => {
     if (ssr) return
-    registerTheme('dark', darkTheme())
   }, [ssr])
 
   return (

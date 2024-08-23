@@ -8,7 +8,6 @@ export type RecordingError = {
 }
 
 export type Recorder = {
-  basicURL: string
   totalMillis: number
 
   isRecording: boolean
@@ -19,7 +18,6 @@ export type Recorder = {
 }
 
 const newRecorder = (): Recorder => ({
-  basicURL: 'http://localhost:8080/debug/pprof',
   totalMillis: 0,
 
   isRecording: false,

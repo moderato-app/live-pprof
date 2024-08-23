@@ -10,6 +10,7 @@ import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
 import { appendGraphData } from '@/components/charts/data-operation'
 import { recorderState } from '@/components/state/recorder-state'
 import { myEmitter } from '@/components/state/emitter'
+import { useURL } from '@/components/hooks/use-url'
 
 export enum PprofType {
   cpu = 'CPU',
@@ -25,7 +26,8 @@ export type GraphDataProps = {
 export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
   const [graphData, setGraphData] = useState<GraphData>(newGraphData())
   const client = useMetricsClient()
-  const { basicURL, isRecording } = useSnapshot(recorderState)
+  const url = useURL()
+  const { isRecording } = useSnapshot(recorderState)
 
   useEffect(() => {
     const clearData = () => {
@@ -37,7 +39,10 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
 
   useEffect(() => {
     if (!isRecording) return
-    const req = new GoMetricsRequest().setUrl(basicURL)
+    if (typeof url !== 'string') {
+      return
+    }
+    const req = new GoMetricsRequest().setUrl(url)
     const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
     const t = setInterval(() => {
       const callback = (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
@@ -83,7 +88,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
       clearTimeout(t)
       streams.forEach(p => p.cancel())
     }
-  }, [client, isRecording, basicURL])
+  }, [client, isRecording, url])
 
   return graphData
 }

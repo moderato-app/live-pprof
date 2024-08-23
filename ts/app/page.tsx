@@ -1,4 +1,4 @@
-import { AllGraphs } from '@/components/charts/all-graphs'
+import { AllGraphs } from '@/components/all-graphs'
 
 export default function Home() {
   return <AllGraphs />

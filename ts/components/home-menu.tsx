@@ -53,11 +53,11 @@ export const HomeMenu = () => {
             key="delete"
             className="text-danger"
             color="danger"
-            description="Remove data of all graphs"
+            description="Clear data from all charts"
             startContent={<Icon color={'danger'} height={iconSize} icon="heroicons:trash" width={iconSize} />}
             onPress={() => myEmitter.emit('clearData', undefined)}
           >
-            Clean Data
+            Clear Data
           </DropdownItem>
         </DropdownSection>
       </DropdownMenu>
