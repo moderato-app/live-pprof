@@ -7,9 +7,11 @@ import { Button } from '@nextui-org/button'
 import { Icon } from '@iconify/react'
 
 import { recorderState } from '@/components/state/recorder-state'
+import { useURL } from '@/components/hooks/use-url'
 
 export const RecorderButton = () => {
   const { isRecording } = useSnapshot(recorderState)
+  const url = useURL()
   const tooltipInfo = isRecording ? 'Stop' : 'Start'
 
   const start = useCallback(() => {
@@ -37,6 +39,7 @@ export const RecorderButton = () => {
           isIconOnly
           aria-label={tooltipInfo}
           className="text-default-500 dark:text-default-foreground"
+          disabled={url instanceof Error}
           variant={'light'}
           onPress={start}
         >
