@@ -20,7 +20,10 @@ test-go:
 	cd go && go test ./...
 
 test-ts:
-	cd ts && npm test
+	cd ts && pnpm test
+
+install-ts:
+	cd ts && pnpm install
 
 clean:
 	rm -rf ts/out

@@ -42,4 +42,4 @@ jobs:
         uses: arduino/setup-protoc@v3
 
       - name: Test
-        run: make proto test-ts
+        run: make proto install-ts test-ts
