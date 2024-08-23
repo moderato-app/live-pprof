@@ -6,11 +6,13 @@ on:
     paths:
       - ts/**
       - proto/**
+      - .github
   pull_request:
     branches: [ "main" ]
     paths:
       - ts/**
       - proto/**
+      - .github
   workflow_dispatch:
 
 jobs:
@@ -32,9 +34,6 @@ jobs:
           version: 9
           run_install: false
 
-      - name: Install dependencies
-        run: pnpm install
-
       - name: Install protoc-gen-js
         run: pnpm install -g protoc-gen-js
 
@@ -42,4 +41,4 @@ jobs:
         uses: arduino/setup-protoc@v3
 
       - name: Test
-        run: make proto install-ts test-ts
+        run: make protoc install-ts test-ts

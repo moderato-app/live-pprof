@@ -1,8 +1,8 @@
 # mode=grpcwebtext prevents client from receiving all the messages at once when using streaming
 
-build: proto build-go build-ts
+build: protoc build-go build-ts
 
-proto:
+protoc: make-dirs
 	protoc --go_out=./go/api --go_opt=paths=source_relative --go-grpc_out=./go/api --go-grpc_opt=paths=source_relative --proto_path ./proto ./proto/api.proto
 	protoc -I=./proto api.proto \
 	  --js_out=import_style=commonjs,binary:./ts/components/api \
@@ -28,3 +28,11 @@ install-ts:
 clean:
 	rm -rf ts/out
 	cd go && go clean
+
+make-dirs:
+	@if [ ! -d "./go/api" ]; then \
+		mkdir ./go/api; \
+	fi
+	@if [ ! -d "./ts/components/api" ]; then \
+		mkdir ./ts/components/api; \
+	fi

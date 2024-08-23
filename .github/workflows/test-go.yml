@@ -6,11 +6,13 @@ on:
     paths:
       - go/**
       - proto/**
+      - .github
   pull_request:
     branches: [ "main" ]
     paths:
       - go/**
       - proto/**
+      - .github
   workflow_dispatch:
 
 jobs:
@@ -32,4 +34,4 @@ jobs:
         uses: arduino/setup-protoc@v3
 
       - name: Test
-        run: make proto test-go
+        run: make protoc test-go
