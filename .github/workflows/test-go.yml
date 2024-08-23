@@ -27,11 +27,8 @@ jobs:
         with:
           go-version: '^1.23'
 
-      - name: Install protoc-gen-go-grpc
-        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
 
       - name: Test
-        run: make protoc test-go
+        run: cd go && make
