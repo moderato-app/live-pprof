@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Test-go:
+  test_go:
     name: Test go
     runs-on: ubuntu-latest
     steps:

@@ -3,7 +3,7 @@ name: Setup TS
 on: [ workflow_call ]
 
 jobs:
-  Setup-TS:
+  setup_ts:
     name: Setup TS
     runs-on: ubuntu-latest
     steps:

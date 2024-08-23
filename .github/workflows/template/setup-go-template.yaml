@@ -3,7 +3,7 @@ name: Setup go
 on: [ workflow_call ]
 
 jobs:
-  Setup-go:
+  setup_go:
     name: Setup go
     runs-on: ubuntu-latest
     steps:

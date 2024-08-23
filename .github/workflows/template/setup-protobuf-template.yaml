@@ -3,7 +3,7 @@ name: Setup protobuf
 on: [ workflow_call ]
 
 jobs:
-  Setup-protobuf:
+  setup_protobuf:
     name: Setup protobuf
     runs-on: ubuntu-latest
     steps:
