@@ -1,21 +1,19 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useSnapshot } from 'valtio/react'
 import getUrls from 'get-urls'
 
 import { graphPrefsState } from '@/components/state/pref-state'
 
 export const useURL = (): { url: string | Error; input: string; setInput: (input: string) => void } => {
-  const { inputURL } = useSnapshot(graphPrefsState)
-  const [url, setUrl] = useState<string | Error>(Error('Initial'))
+  const { inputURL } = useSnapshot(graphPrefsState, { sync: true })
+
   const setInput = useCallback((input: string) => {
     graphPrefsState.inputURL = input
   }, [])
-  useEffect(() => {
-    let gen = generateUrl(inputURL)
-    setUrl(gen)
-  }, [inputURL, setUrl])
+
+  const url = useMemo(() => generateUrl(inputURL), [inputURL])
 
   return { url: url, input: inputURL, setInput: setInput }
 }

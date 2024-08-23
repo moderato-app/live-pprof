@@ -10,7 +10,7 @@ import { MockSwitch } from '@/components/mock-switch'
 import { RecorderButton } from '@/components/recorder-button'
 import { RecorderTime } from '@/components/recorder-time'
 import { HomeMenu } from '@/components/home-menu'
-import UrlChip from '@/components/url-chip'
+import UrlBar from '@/components/url-bar'
 
 export const Navbar = () => {
   return (
@@ -22,7 +22,7 @@ export const Navbar = () => {
           </NextLink>
         </NavbarBrand>
         <ul className="flex justify-center items-center gap-1">
-          <UrlChip />
+          <UrlBar />
           <RecorderButton />
           <RecorderTime />
           <HomeMenu />

@@ -1,13 +1,18 @@
 import { useSnapshot } from 'valtio/react'
+import { useMemo } from 'react'
 
-import { MetricsClient, MockMetricsClient } from '@/components/api/ApiServiceClientPb'
+import { GeneralClient, MetricsClient, MockMetricsClient } from '@/components/api/ApiServiceClientPb'
 import { graphPrefsState } from '@/components/state/pref-state'
-
-export const metricClient = new MetricsClient('http://localhost:8080')
-export const mockMetricClient = new MockMetricsClient('http://localhost:8080')
 
 export const useMetricsClient = (): MetricsClient => {
   const { mock } = useSnapshot(graphPrefsState)
 
-  return mock ? mockMetricClient : metricClient
+  return useMemo(
+    () => (mock ? new MockMetricsClient('http://localhost:8080') : new MetricsClient('http://localhost:8080')),
+    [mock]
+  )
+}
+
+export const useGeneralClient = (): GeneralClient => {
+  return useMemo(() => new GeneralClient('http://localhost:8080'), [])
 }

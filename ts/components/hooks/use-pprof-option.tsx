@@ -12,7 +12,6 @@ import { dispatchGraphPrefProxy, FlatOrCum, graphPrefsState } from '@/components
 import { useBasicOption } from '@/components/hooks/use-basic-option'
 import prettyTime from '@/components/util/prettyTime'
 import { PprofType, useGraphData } from '@/components/hooks/use-graph-data'
-import { newGraphData } from '@/components/charts/data-structure'
 import { myEmitter } from '@/components/state/emitter'
 
 type PprofProps = {

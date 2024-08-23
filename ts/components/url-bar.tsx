@@ -2,12 +2,14 @@
 import React from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '@nextui-org/popover'
 import { Chip } from '@nextui-org/chip'
+import { useIsSSR } from '@react-aria/ssr'
 
-import { UrlInputPopover } from '@/components/url-input-popover'
+import { UrlPopover } from '@/components/url-popover'
 import { useURL } from '@/components/hooks/use-url'
 
-export default function UrlChip() {
+export default function UrlBar() {
   const { url } = useURL()
+  if (useIsSSR()) return null
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -22,7 +24,7 @@ export default function UrlChip() {
           )}
         </PopoverTrigger>
         <PopoverContent className="p-2 bg-foreground-100 ">
-          <UrlInputPopover />
+          <UrlPopover />
         </PopoverContent>
       </Popover>
     </div>

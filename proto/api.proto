@@ -18,6 +18,10 @@ service MockMetrics {
   rpc GoroutineMetrics(GoMetricsRequest) returns (GoMetricsResponse);
 }
 
+service General {
+  rpc DetectURL(DetectURLRequest) returns (stream DetectURLResponse);
+}
+
 message GoMetricsRequest {
   string url = 1;
 }
@@ -33,4 +37,21 @@ message Item {
   string line = 2;
   int64 flat = 3 ;
   int64 cum = 4;
+}
+
+message DetectURLRequest {
+  string url = 1;
+}
+
+message DetectURLResponse {
+  string endpoint = 1;
+
+  optional HTTPResult httpResult = 2;
+  optional string error = 4;
+}
+
+message HTTPResult{
+  int32 statusCode = 1;
+  string statusText = 2;
+  optional string body = 3;
 }

@@ -6,10 +6,11 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix",
-    "test": "vitest"
+    "test": "vitest --run"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.11.1",
+    "@nextui-org/accordion": "^2.0.38",
     "@nextui-org/button": "2.0.37",
     "@nextui-org/card": "^2.0.33",
     "@nextui-org/checkbox": "^2.1.4",

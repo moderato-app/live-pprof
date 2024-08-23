@@ -1,0 +1,26 @@
+name: Test TS
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - ts/**
+      - proto/**
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - ts/**
+      - proto/**
+  workflow_dispatch:
+
+jobs:
+  - name: Test TS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/template/setup-ts-template.yaml
+
+      - name: Test
+        run: make proto test-ts

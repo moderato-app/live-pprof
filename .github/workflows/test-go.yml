@@ -1,0 +1,26 @@
+name: Test go
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - go/**
+      - proto/**
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - go/**
+      - proto/**
+  workflow_dispatch:
+
+jobs:
+  - name: Test go
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/template/setup-go-template.yaml
+
+      - name: Test
+        run: make proto test-go

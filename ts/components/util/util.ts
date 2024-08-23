@@ -28,3 +28,7 @@ export const formatMillis = (millis: number): string => {
   }
   return duration
 }
+
+export const delay = (ms: number) => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}

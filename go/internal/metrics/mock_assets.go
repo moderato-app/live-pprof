@@ -1,24 +1,22 @@
-package main
+package metrics
 
 import (
-	"embed"
 	"errors"
+	"os"
 	"path/filepath"
 	"sort"
 	"sync"
 	"sync/atomic"
 
+	"github.com/moderato-app/live-pprof/assets"
 	"github.com/moderato-app/live-pprof/internal"
 	"github.com/moderato-app/pprof/moderato"
 )
 
-//go:embed assets
-var assets embed.FS
-
-const cpuDir = "assets/mock-data/cpu"
-const heap = "assets/mock-data/heap"
-const allocs = "assets/mock-data/allocs"
-const goroutine = "assets/mock-data/goroutine"
+const cpuDir = "mock-data/cpu"
+const heap = "mock-data/heap"
+const allocs = "mock-data/allocs"
+const goroutine = "mock-data/goroutine"
 
 type MockAssets struct {
 	loadProfilesOnce  func()
@@ -32,6 +30,7 @@ type MockAssets struct {
 func newMockAssets() *MockAssets {
 
 	m := &MockAssets{}
+	internal.Sugar.Info(os.Getwd())
 	m.loadProfilesOnce = sync.OnceFunc(func() {
 		err := walkDirNonRecursive(cpuDir, func(data []byte) {
 			m.cpuProfiles = append(m.cpuProfiles, data)
@@ -76,19 +75,19 @@ func newMockAssets() *MockAssets {
 	return m
 }
 
-func (m *MockAssets) GetMetrics(mt MetricsType) (*moderato.Metrics, error) {
+func (m *MockAssets) GetMetrics(mt internal.MetricsType) (*moderato.Metrics, error) {
 
 	m.loadProfilesOnce()
 
 	cnt := m.mockCount.Add(1)
 	var profile []byte
-	if mt == MetricsTypeHeap {
+	if mt == internal.MetricsTypeHeap {
 		profile = m.heapProfiles[cnt%int64(len(m.cpuProfiles))]
-	} else if mt == MetricsTypeCPU {
+	} else if mt == internal.MetricsTypeCPU {
 		profile = m.cpuProfiles[cnt%int64(len(m.cpuProfiles))]
-	} else if mt == MetricsTypeAllocs {
+	} else if mt == internal.MetricsTypeAllocs {
 		profile = m.allocsProfiles[cnt%int64(len(m.allocsProfiles))]
-	} else if mt == MetricsTypeGoroutine {
+	} else if mt == internal.MetricsTypeGoroutine {
 		profile = m.goroutineProfiles[cnt%int64(len(m.goroutineProfiles))]
 	} else {
 		return nil, errors.New("invalid fetch type")
@@ -105,7 +104,7 @@ func (m *MockAssets) GetMetrics(mt MetricsType) (*moderato.Metrics, error) {
 }
 
 func walkDirNonRecursive(dir string, f func(data []byte)) error {
-	entries, err := assets.ReadDir(dir)
+	entries, err := assets.MockData.ReadDir(dir)
 	sort.Slice(entries, func(i, j int) bool { return entries[i].Name() <= entries[j].Name() })
 	if err != nil {
 		return err
@@ -114,7 +113,7 @@ func walkDirNonRecursive(dir string, f func(data []byte)) error {
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			fPath := filepath.Join(dir, entry.Name())
-			data, err := assets.ReadFile(fPath)
+			data, err := assets.MockData.ReadFile(fPath)
 			if err != nil {
 				return err
 			}

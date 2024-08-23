@@ -11,7 +11,7 @@ import { useURL } from '@/components/hooks/use-url'
 
 export const RecorderButton = () => {
   const { isRecording } = useSnapshot(recorderState)
-  const url = useURL()
+  const { url } = useURL()
   const tooltipInfo = isRecording ? 'Stop' : 'Start'
 
   const start = useCallback(() => {
@@ -30,7 +30,7 @@ export const RecorderButton = () => {
           aria-label={tooltipInfo}
           className="text-default-500 dark:text-default-foreground"
           variant={'light'}
-          onPress={stop}
+          onClick={stop}
         >
           <Icon className="w-6 h-6" icon="solar:stop-bold" />
         </Button>
@@ -39,9 +39,9 @@ export const RecorderButton = () => {
           isIconOnly
           aria-label={tooltipInfo}
           className="text-default-500 dark:text-default-foreground"
-          disabled={url instanceof Error}
+          isDisabled={url instanceof Error}
           variant={'light'}
-          onPress={start}
+          onClick={start}
         >
           <Icon className="w-6 h-6" icon="solar:play-bold" />
         </Button>

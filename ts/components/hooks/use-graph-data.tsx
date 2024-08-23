@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import grpcWeb from 'grpc-web'
 import { useSnapshot } from 'valtio/react'
+import dayjs from 'dayjs'
+import { defer } from 'lodash'
 
 import { GraphData, newGraphData } from '@/components/charts/data-structure'
 import { useMetricsClient } from '@/components/client/metrics'
@@ -26,7 +28,7 @@ export type GraphDataProps = {
 export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
   const [graphData, setGraphData] = useState<GraphData>(newGraphData())
   const client = useMetricsClient()
-  const url = useURL()
+  const { url } = useURL()
   const { isRecording } = useSnapshot(recorderState)
 
   useEffect(() => {
@@ -42,10 +44,23 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
     if (typeof url !== 'string') {
       return
     }
-    const req = new GoMetricsRequest().setUrl(url)
+    let u = url
     const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
-    const t = setInterval(() => {
+    let t: NodeJS.Timeout
+    let lastRequest = dayjs()
+
+    const makeRequest = () => {
       const callback = (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
+        defer(() => {
+          let waitForMs = 1000
+          // cpu request takes about 1 second to complete, so there is no need to wait for 1 second again,
+          // but we need to wait if cpu request fails too fast
+          if (pprofType === PprofType.cpu && dayjs().diff(lastRequest, 'millisecond') > 1000) {
+            waitForMs = 0
+          }
+          t = setTimeout(makeRequest, waitForMs)
+        })
+
         // remove stream from the list
         const index = streams.indexOf(stream)
         if (index > -1) {
@@ -63,26 +78,30 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
       }
 
       let stream: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>
+      const meta = { deadline: dayjs().add(5, 'seconds').toDate().getTime().toString() }
+      lastRequest = dayjs()
+      const req = new GoMetricsRequest().setUrl(u)
       switch (pprofType) {
         case PprofType.cpu:
-          stream = client.cPUMetrics(req, null, callback)
+          stream = client.cPUMetrics(req, meta, callback)
           break
         case PprofType.heap:
-          stream = client.heapMetrics(req, null, callback)
+          stream = client.heapMetrics(req, meta, callback)
           break
         case PprofType.allocs:
-          stream = client.allocsMetrics(req, null, callback)
+          stream = client.allocsMetrics(req, meta, callback)
           break
         case PprofType.goroutine:
-          stream = client.goroutineMetrics(req, null, callback)
+          stream = client.goroutineMetrics(req, meta, callback)
           break
       }
       streams.push(stream)
-    }, 1000)
-
-    if (streams.length > 5) {
-      console.warn('${metricsFunc} created too many concurrent streams. consider set a timeout for each stream')
+      if (streams.length > 5) {
+        console.warn('${metricsFunc} created too many concurrent streams. consider set a timeout for each stream')
+      }
     }
+
+    t = setTimeout(makeRequest, 0)
 
     return () => {
       clearTimeout(t)

@@ -1,11 +1,10 @@
-package main
+package metrics
 
 import (
 	"context"
 	"errors"
 	"io"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/moderato-app/live-pprof/api"
@@ -13,45 +12,36 @@ import (
 	"github.com/moderato-app/pprof/moderato"
 )
 
-type MetricsType int
-
-const (
-	MetricsTypeHeap = MetricsType(iota)
-	MetricsTypeCPU
-	MetricsTypeAllocs
-	MetricsTypeGoroutine
-)
-
 type MetricsServer struct {
 	api.UnimplementedMetricsServer
 }
 
-func newMetricsServer() *MetricsServer {
+func NewMetricsServer() *MetricsServer {
 	return &MetricsServer{}
 }
 
 func (m *MetricsServer) HeapMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	internal.Sugar.Debug("HeapMetrics req:", req)
-	return dispatch(ctx, req, MetricsTypeHeap)
+	return dispatch(ctx, req, internal.MetricsTypeHeap)
 }
 
 func (m *MetricsServer) CPUMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	internal.Sugar.Debug("CPUMetrics req:", req)
-	return dispatch(ctx, req, MetricsTypeCPU)
+	return dispatch(ctx, req, internal.MetricsTypeCPU)
 }
 
 func (m *MetricsServer) AllocsMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	internal.Sugar.Debug("AllocsMetrics req:", req)
-	return dispatch(ctx, req, MetricsTypeAllocs)
+	return dispatch(ctx, req, internal.MetricsTypeAllocs)
 }
 
 func (m *MetricsServer) GoroutineMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	internal.Sugar.Debug("GoroutineMetrics req:", req)
-	return dispatch(ctx, req, MetricsTypeGoroutine)
+	return dispatch(ctx, req, internal.MetricsTypeGoroutine)
 }
 
-func dispatch(ctx context.Context, req *api.GoMetricsRequest, mt MetricsType) (*api.GoMetricsResponse, error) {
-	u, err := prepareUrl(req.Url, mt)
+func dispatch(ctx context.Context, req *api.GoMetricsRequest, mt internal.MetricsType) (*api.GoMetricsResponse, error) {
+	u, err := internal.MetricsURL(req.Url, mt, false)
 	if err != nil {
 		internal.Sugar.Error(err)
 		return nil, err
@@ -86,7 +76,7 @@ func fetch(ctx context.Context, url string) (*moderato.Metrics, error) {
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		internal.Sugar.Error("resp.Body: \n" + string(data))
-		return nil, errors.New("bad status code: " + resp.Status)
+		return nil, errors.New("bad status code: " + resp.Status + ". " + string(data))
 	}
 
 	mtr, err := moderato.GetMetricsFromData(data)
@@ -97,31 +87,6 @@ func fetch(ctx context.Context, url string) (*moderato.Metrics, error) {
 	}
 
 	return mtr, nil
-}
-
-func prepareUrl(baseUrl string, mt MetricsType) (string, error) {
-	parse, err := url.Parse(baseUrl)
-	if err != nil {
-		return "", errors.New("invalid url: " + baseUrl)
-	}
-
-	var u string
-	if mt == MetricsTypeHeap {
-		u = parse.JoinPath("heap").String()
-	} else if mt == MetricsTypeAllocs {
-		u = parse.JoinPath("allocs").String()
-	} else if mt == MetricsTypeGoroutine {
-		u = parse.JoinPath("goroutine").String()
-	} else if mt == MetricsTypeCPU {
-		j := parse.JoinPath("profile")
-		params := url.Values{}
-		params.Add("seconds", "1")
-		j.RawQuery = params.Encode()
-		u = j.String()
-	} else {
-		return "", errors.New("invalid fetch type")
-	}
-	return u, nil
 }
 
 func toResp(mtr *moderato.Metrics) *api.GoMetricsResponse {
