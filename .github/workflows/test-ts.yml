@@ -21,7 +21,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: ./.github/workflows/template/setup-ts-template.yaml
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install protoc-gen-js
+        run: pnpm install -g protoc-gen-js
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
 
       - name: Test
         run: make proto test-ts
