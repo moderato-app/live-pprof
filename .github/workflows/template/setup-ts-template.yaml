@@ -3,7 +3,8 @@ name: Setup TS
 on: [ workflow_call ]
 
 jobs:
-  - name: Setup TS
+  Setup-TS:
+    name: Setup TS
     runs-on: ubuntu-latest
     steps:
       - uses: pnpm/action-setup@v4

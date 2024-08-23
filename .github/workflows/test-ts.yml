@@ -14,7 +14,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  - name: Test TS
+  Test-TS:
+    name: Test TS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
