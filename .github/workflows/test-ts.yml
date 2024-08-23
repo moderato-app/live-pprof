@@ -6,13 +6,13 @@ on:
     paths:
       - ts/**
       - proto/**
-      - .github
+      - .github/**
   pull_request:
     branches: [ "main" ]
     paths:
       - ts/**
       - proto/**
-      - .github
+      - .github/**
   workflow_dispatch:
 
 jobs:
