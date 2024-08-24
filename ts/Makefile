@@ -1,6 +1,6 @@
 # mode=grpcwebtext prevents client from receiving all the messages at once when using streaming
 
-all: protoc test build
+all: protoc disable-trace test build
 
 protoc:
 	@if [ ! -d "./components/api" ]; then \
@@ -12,7 +12,6 @@ protoc:
 	  --grpc-web_out=import_style=typescript,mode=grpcwebtext:./components/api
 
 build: install
-	npx next telemetry --disable
 	pnpm build
 
 test: install
@@ -20,6 +19,10 @@ test: install
 
 install:
 	pnpm install && pnpm install -D vitest
+
+disable-trace:
+	npx next telemetry --disable
+
 
 clean:
 	rm -rf out
