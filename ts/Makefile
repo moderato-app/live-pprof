@@ -12,6 +12,7 @@ protoc:
 	  --grpc-web_out=import_style=typescript,mode=grpcwebtext:./components/api
 
 build: install
+	npx next telemetry --disable
 	pnpm build
 
 test: install
