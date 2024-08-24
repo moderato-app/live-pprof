@@ -1,6 +1,6 @@
 # mode=grpcwebtext prevents client from receiving all the messages at once when using streaming
 
-build: protoc test build
+all: protoc test build
 
 protoc:
 	@if [ ! -d "./components/api" ]; then \
@@ -11,14 +11,14 @@ protoc:
 	  --js_out=import_style=commonjs,binary:./components/api \
 	  --grpc-web_out=import_style=typescript,mode=grpcwebtext:./components/api
 
-build:
+build: install
 	pnpm build
 
-test:
+test: install
 	pnpm test
 
 install:
-	pnpm install
+	pnpm install && pnpm install -D vitest
 
 clean:
 	rm -rf out
