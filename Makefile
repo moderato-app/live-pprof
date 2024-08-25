@@ -9,9 +9,24 @@ test:
 	$(MAKE) -C ts test
 
 build:
-	$(MAKE) -C go build
+	@echo "Building ts..."
 	$(MAKE) -C ts build
+	@echo "Copying files..."
+	$(MAKE) copy
+	@echo "Building go..."
+	$(MAKE) -C go build
 
 clean:
 	$(MAKE) -C go clean
 	$(MAKE) -C ts clean
+	$(MAKE) -C ts build
+	@if [ -d "./go/assets/web/html" ]; then \
+		rm -rf ./go/assets/web/html; \
+	fi
+
+copy:
+	@echo "Running copy..."
+	@if [ -d "./go/assets/web/html" ]; then \
+		rm -rf ./go/assets/web/html; \
+	fi
+	cp -r ts/out go/assets/web/html

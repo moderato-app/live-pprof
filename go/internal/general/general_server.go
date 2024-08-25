@@ -10,6 +10,7 @@ import (
 
 	"github.com/moderato-app/live-pprof/api"
 	"github.com/moderato-app/live-pprof/internal"
+	"github.com/moderato-app/live-pprof/internal/logging"
 )
 
 type GeneralServer struct {
@@ -21,7 +22,7 @@ func NewGeneralServer() *GeneralServer {
 }
 
 func (m *GeneralServer) DetectURL(req *api.DetectURLRequest, stream api.General_DetectURLServer) error {
-	internal.Sugar.Debug("DetectURL req:", req)
+	logging.Sugar.Debug("DetectURL req:", req)
 	wg := sync.WaitGroup{}
 	mts := [...]internal.MetricsType{
 		internal.MetricsTypeHeap,
@@ -35,7 +36,7 @@ func (m *GeneralServer) DetectURL(req *api.DetectURLRequest, stream api.General_
 	for _, mt := range mts {
 		url, err := internal.MetricsURL(req.Url, mt, true)
 		if err != nil {
-			internal.Sugar.Error(err)
+			logging.Sugar.Error(err)
 			panic(err)
 		}
 		urls = append(urls, url)
@@ -60,7 +61,7 @@ func (m *GeneralServer) DetectURL(req *api.DetectURLRequest, stream api.General_
 			}
 			err = stream.Send(&resp)
 			if err != nil {
-				internal.Sugar.Error(err)
+				logging.Sugar.Error(err)
 			}
 		}(url)
 	}
@@ -70,7 +71,7 @@ func (m *GeneralServer) DetectURL(req *api.DetectURLRequest, stream api.General_
 
 func detect(ctx context.Context, url string) (*api.HTTPResult, error) {
 	client := &http.Client{}
-	internal.Sugar.Debugf("GET %s", url)
+	logging.Sugar.Debugf("GET %s", url)
 
 	method := http.MethodGet
 
@@ -91,7 +92,7 @@ func detect(ctx context.Context, url string) (*api.HTTPResult, error) {
 	data, err := io.ReadAll(resp.Body)
 
 	if resp.StatusCode < 200 || resp.StatusCode > 399 {
-		internal.Sugar.Info("resp.Body: \n" + string(data))
+		logging.Sugar.Info("resp.Body: \n" + string(data))
 	}
 
 	bodyStr := string(data)

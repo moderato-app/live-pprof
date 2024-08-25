@@ -9,6 +9,7 @@ import (
 
 	"github.com/moderato-app/live-pprof/api"
 	"github.com/moderato-app/live-pprof/internal"
+	"github.com/moderato-app/live-pprof/internal/logging"
 	"github.com/moderato-app/pprof/moderato"
 )
 
@@ -21,35 +22,35 @@ func NewMetricsServer() *MetricsServer {
 }
 
 func (m *MetricsServer) HeapMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
-	internal.Sugar.Debug("HeapMetrics req:", req)
+	logging.Sugar.Debug("HeapMetrics req:", req)
 	return dispatch(ctx, req, internal.MetricsTypeHeap)
 }
 
 func (m *MetricsServer) CPUMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
-	internal.Sugar.Debug("CPUMetrics req:", req)
+	logging.Sugar.Debug("CPUMetrics req:", req)
 	return dispatch(ctx, req, internal.MetricsTypeCPU)
 }
 
 func (m *MetricsServer) AllocsMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
-	internal.Sugar.Debug("AllocsMetrics req:", req)
+	logging.Sugar.Debug("AllocsMetrics req:", req)
 	return dispatch(ctx, req, internal.MetricsTypeAllocs)
 }
 
 func (m *MetricsServer) GoroutineMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
-	internal.Sugar.Debug("GoroutineMetrics req:", req)
+	logging.Sugar.Debug("GoroutineMetrics req:", req)
 	return dispatch(ctx, req, internal.MetricsTypeGoroutine)
 }
 
 func dispatch(ctx context.Context, req *api.GoMetricsRequest, mt internal.MetricsType) (*api.GoMetricsResponse, error) {
 	u, err := internal.MetricsURL(req.Url, mt, false)
 	if err != nil {
-		internal.Sugar.Error(err)
+		logging.Sugar.Error(err)
 		return nil, err
 	}
 
 	mtr, err := fetch(ctx, u)
 	if err != nil {
-		internal.Sugar.Error(err)
+		logging.Sugar.Error(err)
 		return nil, err
 	}
 
@@ -61,7 +62,7 @@ func dispatch(ctx context.Context, req *api.GoMetricsRequest, mt internal.Metric
 func fetch(ctx context.Context, url string) (*moderato.Metrics, error) {
 
 	client := &http.Client{}
-	internal.Sugar.Debugf("GET %s", url)
+	logging.Sugar.Debugf("GET %s", url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -75,14 +76,14 @@ func fetch(ctx context.Context, url string) (*moderato.Metrics, error) {
 	data, err := io.ReadAll(resp.Body)
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		internal.Sugar.Error("resp.Body: \n" + string(data))
+		logging.Sugar.Error("resp.Body: \n" + string(data))
 		return nil, errors.New("bad status code: " + resp.Status + ". " + string(data))
 	}
 
 	mtr, err := moderato.GetMetricsFromData(data)
 	if err != nil {
-		internal.Sugar.Error(err)
-		internal.Sugar.Error("resp.Body: \n" + string(data))
+		logging.Sugar.Error(err)
+		logging.Sugar.Error("resp.Body: \n" + string(data))
 		return nil, err
 	}
 

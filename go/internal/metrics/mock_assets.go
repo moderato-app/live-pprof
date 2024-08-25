@@ -10,6 +10,7 @@ import (
 
 	"github.com/moderato-app/live-pprof/assets"
 	"github.com/moderato-app/live-pprof/internal"
+	"github.com/moderato-app/live-pprof/internal/logging"
 	"github.com/moderato-app/pprof/moderato"
 )
 
@@ -30,7 +31,7 @@ type MockAssets struct {
 func newMockAssets() *MockAssets {
 
 	m := &MockAssets{}
-	internal.Sugar.Info(os.Getwd())
+	logging.Sugar.Info(os.Getwd())
 	m.loadProfilesOnce = sync.OnceFunc(func() {
 		err := walkDirNonRecursive(cpuDir, func(data []byte) {
 			m.cpuProfiles = append(m.cpuProfiles, data)
@@ -95,8 +96,8 @@ func (m *MockAssets) GetMetrics(mt internal.MetricsType) (*moderato.Metrics, err
 
 	mtr, err := moderato.GetMetricsFromData(profile)
 	if err != nil {
-		internal.Sugar.Error(err)
-		internal.Sugar.Error("profile data: \n" + string(profile))
+		logging.Sugar.Error(err)
+		logging.Sugar.Error("profile data: \n" + string(profile))
 		return nil, err
 	}
 

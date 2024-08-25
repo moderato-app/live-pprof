@@ -2,6 +2,7 @@
 **/.vscode
 go/api/*
 go/live-pprof
+go/assets/web/html
 ts/components/api/*
 node_modules
 go.work

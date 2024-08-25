@@ -9,50 +9,43 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/go-chi/chi/v5"
-	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	chi2 "github.com/moderato-app/live-pprof/internal/chi"
+	"github.com/moderato-app/live-pprof/internal/logging"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 )
 
-func StartServeGrpc(s *grpc.Server) {
+func StartServeGrpc(gs *grpc.Server) {
 
 	stopChan := make(chan os.Signal, 1)
 	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
 	l, err := net.Listen("tcp", ":8080")
 	if err != nil {
-		Sugar.Fatal(err)
+		logging.Sugar.Fatal(err)
 	} else {
-		Sugar.Info("listening on :8080")
+		logging.Sugar.Info("listening on :8080")
 	}
 
-	wrappedGrpc := grpcweb.WrapServer(s, grpcweb.WithOriginFunc(func(origin string) bool {
+	wrappedGrpc := grpcweb.WrapServer(gs, grpcweb.WithOriginFunc(func(origin string) bool {
 		return true
 	}))
 
-	router := chi.NewRouter()
-	router.Use(
-		chiMiddleware.Logger,
-		chiMiddleware.Recoverer,
-		grpcMiddlware(wrappedGrpc),
-	)
-
-	router.Get("/todo", nil)
+	s := chi2.WebServer(wrappedGrpc)
 
 	go func() {
-		if err := http.Serve(l, router); err != nil {
+		if err := http.Serve(l, s); err != nil {
 			log.Fatalf("failed starting http2 server: %v", err)
 		}
 	}()
 
 	<-stopChan
-	gracefulShutdown(s)
+	gracefulShutdown(gs)
 }
 
 func gracefulShutdown(s *grpc.Server) {
-	Sugar.Info("shutting down gRPC server gracefully")
+	logging.Sugar.Info("shutting down gRPC server gracefully")
 	doneChan := make(chan struct{})
 	go func() {
 		s.GracefulStop()
