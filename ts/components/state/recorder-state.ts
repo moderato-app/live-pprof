@@ -27,3 +27,9 @@ const newRecorder = (): Recorder => ({
 })
 
 export const recorderState = proxy<Recorder>(newRecorder())
+
+export const resetRecorder = () => {
+  recorderState.totalMillis = 0
+  recorderState.currentMillis = 0
+  recorderState.lastStarted = dayjs()
+}

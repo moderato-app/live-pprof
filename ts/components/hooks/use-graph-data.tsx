@@ -10,7 +10,7 @@ import { useMetricsClient } from '@/components/client/metrics'
 import * as api_pb from '@/components/api/api_pb'
 import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
 import { appendGraphData } from '@/components/charts/data-operation'
-import { recorderState } from '@/components/state/recorder-state'
+import { recorderState, resetRecorder } from '@/components/state/recorder-state'
 import { myEmitter } from '@/components/state/emitter'
 import { useURL } from '@/components/hooks/use-url'
 import { graphPrefsState } from '@/components/state/pref-state'
@@ -36,6 +36,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
   useEffect(() => {
     const clearData = () => {
       setGraphData(newGraphData())
+      resetRecorder()
     }
     myEmitter.on('clearData', clearData)
     return () => myEmitter.on('clearData', clearData)

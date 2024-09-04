@@ -114,12 +114,14 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
     if (!params[0]) {
       return ''
     }
-    let output =
-      `<div class="tooltip"> <span class="text-default-600 pb-1 font-mono cursor-pointer select-text">${params[0].axisValueLabel}</span>` +
-      '<br/>'
-
-    output += '<div class="w-full cursor-pointer select-text">'
-
+    let output = `
+<div class="tooltip"> 
+  <div class="flex justify-between text-default-600 pb-1 font-mono cursor-pointer select-text">
+    <span>${params[0].axisValueLabel}</span>
+    <span class="font-semibold">flat</span>
+  </div>
+  <div class="w-full cursor-pointer select-text">
+`
     params.slice(0, 20).forEach(p => {
       const value = p.value[foc.toLowerCase()]
       const splits = p.seriesName.split(' ')
