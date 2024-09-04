@@ -6,7 +6,10 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   output: 'export',
 })
 
-module.exports = withBundleAnalyzer(nextConfig)
+module.exports = {
+  ...withBundleAnalyzer(nextConfig),
+  output: 'export',
+}
 
 // if you want to serve WEB with node, use webpack instead
 // const withTM = require("next-transpile-modules")(["echarts", "zrender"]);
