@@ -9,7 +9,6 @@ import { Chip } from '@nextui-org/chip'
 import { useURL } from '@/components/hooks/use-url'
 import { UrlDetect } from '@/components/url-detect'
 import { Link } from '@nextui-org/link'
-import { AnchorIcon } from '@nextui-org/shared-icons'
 import { Icon } from '@iconify/react'
 import { Tooltip } from '@nextui-org/tooltip'
 
