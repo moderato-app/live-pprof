@@ -6,6 +6,7 @@ import { useSnapshot } from 'valtio/react'
 import clsx from 'clsx'
 import { Tooltip } from '@nextui-org/tooltip'
 import { useIsSSR } from '@react-aria/ssr'
+import { Divider } from '@nextui-org/divider'
 
 import { dispatchGraphPrefProxy } from '@/components/state/pref-state'
 import { PprofType } from '@/components/hooks/use-graph-data'
@@ -51,6 +52,7 @@ export const ChartOption: React.FC<ChartPrefProps> = ({ pprofType, className }) 
       <Checkbox className="" isSelected={total} size="sm" value="Total" onValueChange={setTotal}>
         Total
       </Checkbox>
+      <Divider className="h-4 bg-default-300" orientation={'vertical'} />
       <Tooltip
         className="bg-default-200"
         closeDelay={0}
