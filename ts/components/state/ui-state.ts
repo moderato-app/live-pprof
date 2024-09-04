@@ -4,10 +4,12 @@ import { proxy } from 'valtio'
 type UI = {
   hoveringDate?: Date
   cursorPos: { x: number; y: number }
+  openAboutModal: () => void
 }
 
 const newUI = (): UI => ({
   cursorPos: { x: 0, y: 0 },
+  openAboutModal: () => {},
 })
 
 export const uiState = proxy<UI>(newUI())

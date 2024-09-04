@@ -13,6 +13,7 @@ import { appendGraphData } from '@/components/charts/data-operation'
 import { recorderState } from '@/components/state/recorder-state'
 import { myEmitter } from '@/components/state/emitter'
 import { useURL } from '@/components/hooks/use-url'
+import { graphPrefsState } from '@/components/state/pref-state'
 
 export enum PprofType {
   cpu = 'CPU',
@@ -30,6 +31,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
   const client = useMetricsClient()
   const { url } = useURL()
   const { isRecording } = useSnapshot(recorderState)
+  const { retainedSamples, sampleInterval } = useSnapshot(graphPrefsState)
 
   useEffect(() => {
     const clearData = () => {
@@ -46,19 +48,21 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
     }
     let u = url
     const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
+    const cbs: NodeJS.Timeout[] = []
     let t: NodeJS.Timeout
     let lastRequest = dayjs()
 
     const makeRequest = () => {
       const callback = (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
         defer(() => {
-          let waitForMs = 1000
+          let waitForMs = sampleInterval
           // cpu request takes about 1 second to complete, so there is no need to wait for 1 second again,
           // but we need to wait if cpu request fails too fast
-          if (pprofType === PprofType.cpu && dayjs().diff(lastRequest, 'millisecond') > 1000) {
+          if (pprofType === PprofType.cpu && dayjs().diff(lastRequest, 'millisecond') > sampleInterval) {
             waitForMs = 0
           }
           t = setTimeout(makeRequest, waitForMs)
+          cbs.push(t)
         })
 
         // remove stream from the list
@@ -72,7 +76,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
         } else {
           console.debug(`${pprofType} rpc resp`, response)
           setGraphData(prevData => {
-            return appendGraphData(prevData, response)
+            return appendGraphData(prevData, response, retainedSamples)
           })
         }
       }
@@ -106,8 +110,9 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
     return () => {
       clearTimeout(t)
       streams.forEach(p => p.cancel())
+      cbs.forEach(t => clearTimeout(t))
     }
-  }, [client, isRecording, url])
+  }, [client, isRecording, url, sampleInterval, retainedSamples])
 
   return graphData
 }

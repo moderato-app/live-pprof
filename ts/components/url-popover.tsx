@@ -31,7 +31,7 @@ export const UrlPopover = () => {
         errorMessage={url instanceof Error ? url.message : undefined}
         isInvalid={isInvalid}
         placeholder={placeholder}
-        type="email"
+        type="url"
         value={input}
         variant="bordered"
         onValueChange={setInput}

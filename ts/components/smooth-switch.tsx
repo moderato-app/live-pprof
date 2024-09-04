@@ -6,7 +6,6 @@ import { useSnapshot } from 'valtio/react'
 import clsx from 'clsx'
 import { Icon } from '@iconify/react'
 import { useIsSSR } from '@react-aria/ssr'
-import { Tooltip } from '@nextui-org/tooltip'
 
 import { graphPrefsState } from '@/components/state/pref-state'
 import { CurveIcon } from '@/components/icons'
@@ -24,7 +23,8 @@ export const SmoothSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) =>
   }
 
   return (
-    <Tooltip className="bg-default-200" closeDelay={0} content={`Smooth Chart Lines`} delay={500}>
+    <div className="flex flex-col gap-0.5 pl-3 py-1 bg-default-100 rounded-lg">
+      <p className="text-xs text-default-600">Smooth Chart Lines</p>
       <Switch
         className={clsx('', className, classNames?.base)}
         color="success"
@@ -36,6 +36,6 @@ export const SmoothSwitch: FC<ThemeSwitchProps> = ({ className, classNames }) =>
           graphPrefsState.smooth = v
         }}
       />
-    </Tooltip>
+    </div>
   )
 }

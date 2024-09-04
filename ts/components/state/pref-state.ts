@@ -3,7 +3,7 @@ import { proxy, subscribe } from 'valtio'
 
 import { PprofType } from '@/components/hooks/use-graph-data'
 
-const graphsPrefsLSKey = 'graph prefs v21'
+const graphsPrefsLSKey = 'graph-prefs-v23'
 
 export enum FlatOrCum {
   flat = 'flat',
@@ -31,6 +31,8 @@ export type GraphPrefs = {
   smooth: boolean
   mock: boolean
   inputURL: string
+  retainedSamples: number
+  sampleInterval: number
 }
 
 const newGraphPrefs = (): GraphPrefs => ({
@@ -42,6 +44,8 @@ const newGraphPrefs = (): GraphPrefs => ({
   smooth: false,
   mock: false,
   inputURL: '8080',
+  retainedSamples: 120,
+  sampleInterval: 1000,
 })
 
 const IS_CLIENT = typeof window !== 'undefined'
