@@ -18,9 +18,7 @@ export const useBackendURL = (): string => {
     return blackHole
   }
 
-  console.info('isDev', isDev)
   if (isDev) {
-    console.info('using', process.env.NEXT_PUBLIC_BACKEND_URL, 'as backend grpc endpoint')
     return process.env.NEXT_PUBLIC_BACKEND_URL!
   } else {
     return `${window.location.protocol}//${window.location.hostname}:${window.location.port}`

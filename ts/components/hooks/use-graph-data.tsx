@@ -13,7 +13,7 @@ import { appendGraphData } from '@/components/charts/data-operation'
 import { recorderState, resetRecorder } from '@/components/state/recorder-state'
 import { myEmitter } from '@/components/state/emitter'
 import { useURL } from '@/components/hooks/use-url'
-import { graphPrefsState } from '@/components/state/pref-state'
+import { dispatchGraphPrefProxy, graphPrefsState } from '@/components/state/pref-state'
 
 export enum PprofType {
   cpu = 'CPU',
@@ -32,6 +32,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
   const { url } = useURL()
   const { isRecording } = useSnapshot(recorderState)
   const { retainedSamples, sampleInterval } = useSnapshot(graphPrefsState)
+  const { topN } = useSnapshot(dispatchGraphPrefProxy(pprofType))
 
   useEffect(() => {
     const clearData = () => {
@@ -77,7 +78,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
         } else {
           console.debug(`${pprofType} rpc resp`, response)
           setGraphData(prevData => {
-            return appendGraphData(prevData, response, retainedSamples)
+            return appendGraphData(prevData, response, topN, retainedSamples)
           })
         }
       }
@@ -113,7 +114,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
       streams.forEach(p => p.cancel())
       cbs.forEach(t => clearTimeout(t))
     }
-  }, [client, isRecording, url, sampleInterval, retainedSamples])
+  }, [client, isRecording, url, sampleInterval, retainedSamples, topN])
 
   return graphData
 }

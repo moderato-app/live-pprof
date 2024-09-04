@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import { registerTheme } from 'echarts'
 import { useIsSSR } from '@react-aria/ssr'
 
-import { ChartPref } from '@/components/charts/chart-pref'
+import { ChartOption } from '@/components/chart-option'
 import darkTheme from '@/components/charts/dark-theme'
 import { PprofType } from '@/components/hooks/use-graph-data'
 import { PprofGraph } from '@/components/charts/pprof-chart'
@@ -34,7 +34,7 @@ export const AllGraphs: React.FC = () => {
         .filter(snap => snap.prefSnap.enabled)
         .map(snap => (
           <div key={snap.pprofType} className="flex flex-col basis-[49%] h-[49%] relative">
-            <ChartPref
+            <ChartOption
               className={`absolute top-2.5 z-10 ${snap.leftOffsetLarge ? 'left-32' : 'left-20'}`}
               pprofType={snap.pprofType}
             />

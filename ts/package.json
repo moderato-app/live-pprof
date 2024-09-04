@@ -24,6 +24,7 @@
     "@nextui-org/listbox": "2.1.25",
     "@nextui-org/modal": "^2.0.39",
     "@nextui-org/navbar": "2.0.36",
+    "@nextui-org/select": "^2.2.5",
     "@nextui-org/snippet": "2.0.41",
     "@nextui-org/spacer": "^2.0.32",
     "@nextui-org/switch": "2.0.33",

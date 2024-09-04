@@ -5,10 +5,19 @@ import { convertUnixNanoToDate } from '@/components/util/util'
 
 const getKey = (item: Item): string => item.getFunc() + ' ' + item.getLine()
 
-export function appendGraphData(graphData: GraphData, rsp: GoMetricsResponse, retainedSamples?: number): GraphData {
+export function appendGraphData(
+  graphData: GraphData,
+  rsp: GoMetricsResponse,
+  topN: number,
+  retainedSamples?: number
+): GraphData {
   let date = convertUnixNanoToDate(rsp.getDate())
 
-  let items = rsp.getItemsList().filter(item => item.getFlat() > 0)
+  let items = rsp
+    .getItemsList()
+    .filter(item => item.getFlat() > 0)
+    .sort((a, b) => b.getFlat() - a.getFlat())
+    .slice(0, topN)
 
   graphData.dates.push(date)
 
