@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -19,21 +20,20 @@ import (
 )
 
 func StartServeGrpc(gs *grpc.Server, conf *config.LivePprofConfig) {
+	l, port, err := findPort(conf.Port, conf.Host)
+	if err != nil {
+		logging.Sugar.Fatal(err)
+	}
+
+	logging.Sugar.Info("listening on", l.Addr().String())
+	addr := fmt.Sprintf("%s:%d", strings.Replace(conf.Host, "0.0.0.0", "localhost", 1), port)
+
+	//goland:noinspection HttpUrlsUsage
+	httpURL := "http://" + addr
+	logging.Sugar.Info("click to open:", httpURL)
 
 	stopChan := make(chan os.Signal, 1)
 	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
-
-	addr := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
-	l, err := net.Listen("tcp", addr)
-	if err != nil {
-		logging.Sugar.Fatal(err)
-	} else {
-		logging.Sugar.Info("listening on", addr)
-		addr = strings.Replace(addr, "0.0.0.0", "localhost", 1)
-		//goland:noinspection HttpUrlsUsage
-		httpURL := "http://" + addr
-		logging.Sugar.Info(httpURL)
-	}
 
 	wrappedGrpc := grpcweb.WrapServer(gs, grpcweb.WithOriginFunc(func(origin string) bool {
 		return true
@@ -49,6 +49,28 @@ func StartServeGrpc(gs *grpc.Server, conf *config.LivePprofConfig) {
 
 	<-stopChan
 	gracefulShutdown(gs)
+
+}
+
+func findPort(port uint, host string) (net.Listener, uint, error) {
+	for {
+		if port > 65535 || port == 0 {
+			return nil, 0, errors.New("port out of range [1, 65535]")
+		}
+		addr := fmt.Sprintf("%s:%d", host, port)
+		l, err := net.Listen("tcp", addr)
+		if err != nil {
+			// port already in use
+			if strings.Contains(err.Error(), "bind: address already in use") {
+				logging.Sugar.Warnf("address %s already in use, will use a port %d", addr, port+1)
+				port++
+			} else {
+				return nil, 0, err
+			}
+		} else {
+			return l, port, nil
+		}
+	}
 }
 
 func gracefulShutdown(s *grpc.Server) {
