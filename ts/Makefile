@@ -3,6 +3,7 @@
 all: protoc disable-telemetry test build
 
 protoc:
+	@echo "Generating protobuf files for ts"
 	@if [ ! -d "./components/api" ]; then \
 		mkdir ./components/api; \
 	fi
@@ -12,17 +13,22 @@ protoc:
 	  --grpc-web_out=import_style=typescript,mode=grpcwebtext:./components/api
 
 build: install
+	@echo "Building ts"
 	pnpm build
 
 test: install
+	@echo "Testing ts"
 	pnpm test
 
 install:
-	pnpm install && pnpm install -D vitest
+	@echo "Installing dependencies for ts"
+	pnpm install
 
 disable-telemetry:
+	@echo "Disabling Next.js telemetry"
 	npx next telemetry --disable
 
 
 clean:
+	@echo "Cleaning ts"
 	rm -rf out

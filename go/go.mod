@@ -11,6 +11,8 @@ require (
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
 	github.com/moderato-app/pprof v0.0.0-20240823224210-78ccd2f4d170
+	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
+	github.com/spf13/pflag v1.0.5
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.65.0
 	google.golang.org/protobuf v1.34.2

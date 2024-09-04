@@ -1,31 +1,38 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
-	chi2 "github.com/moderato-app/live-pprof/internal/chi"
-	"github.com/moderato-app/live-pprof/internal/logging"
-
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	chi2 "github.com/moderato-app/live-pprof/internal/chi"
+	"github.com/moderato-app/live-pprof/internal/config"
+	"github.com/moderato-app/live-pprof/internal/logging"
 	"google.golang.org/grpc"
 )
 
-func StartServeGrpc(gs *grpc.Server) {
+func StartServeGrpc(gs *grpc.Server, conf *config.LivePprofConfig) {
 
 	stopChan := make(chan os.Signal, 1)
 	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
-	l, err := net.Listen("tcp", ":8080")
+	addr := fmt.Sprintf("%s:%d", conf.Host, conf.Port)
+	l, err := net.Listen("tcp", addr)
 	if err != nil {
 		logging.Sugar.Fatal(err)
 	} else {
-		logging.Sugar.Info("listening on :8080")
+		logging.Sugar.Info("listening on", addr)
+		addr = strings.Replace(addr, "0.0.0.0", "localhost", 1)
+		//goland:noinspection HttpUrlsUsage
+		httpURL := "http://" + addr
+		logging.Sugar.Info(httpURL)
 	}
 
 	wrappedGrpc := grpcweb.WrapServer(gs, grpcweb.WithOriginFunc(func(origin string) bool {

@@ -1,18 +1,38 @@
+'use client'
+
 import { useSnapshot } from 'valtio/react'
 import { useMemo } from 'react'
+import { useIsSSR } from '@react-aria/ssr'
 
 import { GeneralClient, MetricsClient, MockMetricsClient } from '@/components/api/ApiServiceClientPb'
 import { graphPrefsState } from '@/components/state/pref-state'
+import { useIsDev } from '@/components/hooks/use-is-dev'
+
+const blackHole = 'http://240.0.0.0:8300'
+export const useBackendURL = (): string => {
+  const isDev = useIsDev()
+  const isSSR = useIsSSR()
+  if (isSSR) {
+    // black hole
+    return blackHole
+  }
+
+  console.info('isDev', isDev)
+  if (isDev) {
+    console.info('using', process.env.NEXT_PUBLIC_BACKEND_URL, 'as backend grpc endpoint')
+    return process.env.NEXT_PUBLIC_BACKEND_URL!
+  }
+
+  return `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
+}
 
 export const useMetricsClient = (): MetricsClient => {
   const { mock } = useSnapshot(graphPrefsState)
-
-  return useMemo(
-    () => (mock ? new MockMetricsClient('http://localhost:8080') : new MetricsClient('http://localhost:8080')),
-    [mock]
-  )
+  const url = useBackendURL()
+  return useMemo(() => (mock ? new MockMetricsClient(url) : new MetricsClient(url)), [mock, url])
 }
 
 export const useGeneralClient = (): GeneralClient => {
-  return useMemo(() => new GeneralClient('http://localhost:8080'), [])
+  const url = useBackendURL()
+  return useMemo(() => new GeneralClient(url), [url])
 }

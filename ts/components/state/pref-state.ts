@@ -43,7 +43,7 @@ const newGraphPrefs = (): GraphPrefs => ({
 
   smooth: false,
   mock: false,
-  inputURL: '8080',
+  inputURL: `${8300}`, // get metrics from backend by default
   retainedSamples: 120,
   sampleInterval: 1000,
 })

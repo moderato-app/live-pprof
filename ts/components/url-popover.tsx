@@ -19,7 +19,7 @@ export const UrlPopover = () => {
     return null
   }
 
-  const placeholder = '8080, localhost:8080 or http://localhost:8080/debug/pprof'
+  const placeholder = '8300, localhost:8300 or http://localhost:8300/debug/pprof'
   return (
     <div className="flex flex-col justify-start items-start  max-w-[80vw] max-h-[80vh]">
       {/* to provide auto inferred width for <Input> */}

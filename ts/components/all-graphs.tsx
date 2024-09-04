@@ -9,11 +9,14 @@ import { PprofType } from '@/components/hooks/use-graph-data'
 import { PprofGraph } from '@/components/charts/pprof-chart'
 import { useWindowListener } from '@/components/window-listener'
 import { useGraphPrefSnap } from '@/components/hooks/use-graph-pref-snap'
+import { useParamAction } from '@/components/hooks/use-param-action'
+
 registerTheme('dark', darkTheme())
 
 export const AllGraphs: React.FC = () => {
   const ssr = useIsSSR()
   useWindowListener()
+  useParamAction()
   const [cpu, heap, allocs, goroutine] = [
     useGraphPrefSnap(PprofType.cpu),
     useGraphPrefSnap(PprofType.heap),

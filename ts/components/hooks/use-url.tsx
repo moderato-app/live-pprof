@@ -18,7 +18,7 @@ export const useURL = (): { url: string | Error; input: string; setInput: (input
   return { url: url, input: inputURL, setInput: setInput }
 }
 
-const generateUrl = (input: string): string | Error => {
+export const generateUrl = (input: string): string | Error => {
   const port = Number(input)
   if (input === '') {
     return new Error('Please input the URL of pprof endpoint')

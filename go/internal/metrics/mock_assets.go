@@ -2,7 +2,6 @@ package metrics
 
 import (
 	"errors"
-	"os"
 	"path/filepath"
 	"sort"
 	"sync"
@@ -31,7 +30,6 @@ type MockAssets struct {
 func newMockAssets() *MockAssets {
 
 	m := &MockAssets{}
-	logging.Sugar.Info(os.Getwd())
 	m.loadProfilesOnce = sync.OnceFunc(func() {
 		err := walkDirNonRecursive(cpuDir, func(data []byte) {
 			m.cpuProfiles = append(m.cpuProfiles, data)
