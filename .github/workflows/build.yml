@@ -28,7 +28,7 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: 'ts/package.json'
 
-      - name: Install dependencies
+      - name: Install ts dependencies
         run: cd ts && pnpm install
 
       - uses: actions/setup-go@v5
@@ -47,3 +47,5 @@ jobs:
         with:
           name: live-pprof
           path: go/live-pprof
+          compression-level: 9
+          retention-days: 10
