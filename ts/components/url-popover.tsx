@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-autofocus */
 'use client'
 
 import { Input } from '@nextui-org/input'
@@ -26,6 +27,7 @@ export const UrlPopover = () => {
       <Input
         fullWidth
         isClearable
+        autoFocus={true}
         className={'w-full max-w-full'}
         color={isInvalid ? 'danger' : 'success'}
         errorMessage={url instanceof Error ? url.message : undefined}
