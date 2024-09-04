@@ -65,10 +65,6 @@ export const UrlDetect: FC<UrlDetectProps> = ({ url }) => {
 
   return (
     <div className={'flex flex-col gap-1'}>
-      <Chip className={'text-default-500'} size={'sm'} variant={'light'}>
-        {url}
-      </Chip>
-
       <Spacer y={4} />
       <div className={'flex flex-col mx-2'}>
         {rpcError && (

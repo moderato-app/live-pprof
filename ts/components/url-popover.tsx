@@ -4,9 +4,14 @@
 import { Input } from '@nextui-org/input'
 import React, { useMemo } from 'react'
 import { useIsSSR } from '@react-aria/ssr'
+import { Chip } from '@nextui-org/chip'
 
 import { useURL } from '@/components/hooks/use-url'
 import { UrlDetect } from '@/components/url-detect'
+import { Link } from '@nextui-org/link'
+import { AnchorIcon } from '@nextui-org/shared-icons'
+import { Icon } from '@iconify/react'
+import { Tooltip } from '@nextui-org/tooltip'
 
 export const UrlPopover = () => {
   const { url, input, setInput } = useURL()
@@ -38,6 +43,22 @@ export const UrlPopover = () => {
         variant="bordered"
         onValueChange={setInput}
       />
+      {typeof url === 'string' && (
+        <div className="flex">
+          <Chip className={'text-default-500'} size={'sm'} variant={'light'}>
+            {url}
+          </Chip>
+          <Tooltip className="bg-default-200" closeDelay={0} content={`open ${url}`} delay={500}>
+            <Link
+              isExternal
+              href={url}
+              showAnchorIcon
+              className={'text-default-500'}
+              anchorIcon={<Icon icon="solar:round-arrow-right-bold" />}
+            ></Link>
+          </Tooltip>
+        </div>
+      )}
       {typeof url === 'string' && <UrlDetect url={url} />}
     </div>
   )
