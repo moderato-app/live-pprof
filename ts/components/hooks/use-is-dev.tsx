@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 
 export const useIsDev = (): boolean => {
   const [isDev, setIsDev] = useState(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setIsDev(process.env.NODE_ENV === 'development')
   }, [])
 

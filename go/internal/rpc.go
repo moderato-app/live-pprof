@@ -30,7 +30,7 @@ func StartServeGrpc(gs *grpc.Server, conf *config.LivePprofConfig) {
 
 	//goland:noinspection HttpUrlsUsage
 	httpURL := "http://" + addr
-	logging.Sugar.Info("click to open:", httpURL)
+	logging.Sugar.Info("click to open: ", httpURL)
 
 	stopChan := make(chan os.Signal, 1)
 	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)

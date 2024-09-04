@@ -2,6 +2,7 @@
 
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { Chip } from '@nextui-org/chip'
+import { Spinner } from '@nextui-org/spinner'
 import { ClientReadableStream, RpcError } from 'grpc-web'
 import { Icon } from '@iconify/react'
 import { Spacer } from '@nextui-org/spacer'
@@ -60,7 +61,7 @@ export const UrlDetect: FC<UrlDetectProps> = ({ url }) => {
       stream && stream.cancel()
       clearTimeout(t)
     }
-  }, [url, setResults])
+  }, [url, setResults, client])
 
   return (
     <div className={'flex flex-col gap-1'}>
@@ -96,7 +97,7 @@ export const UrlDetect: FC<UrlDetectProps> = ({ url }) => {
             </AccordionItem>
           ))}
         </Accordion>
-        {status === Status.loading && <Icon className="self-center w-8 h-8" icon="line-md:loading-twotone-loop" />}
+        {status === Status.loading && <Spinner />}
       </div>
       <div />
     </div>

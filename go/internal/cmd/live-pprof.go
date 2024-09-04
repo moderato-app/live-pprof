@@ -53,7 +53,7 @@ func maybeOpenURL(conf *config.LivePprofConfig) {
 
 		_ = browser.OpenURL(u.String())
 	} else {
-		logging.Sugar.Infow("will not open the browser", "conf.OpenBrowser", conf.OpenBrowser,
+		logging.Sugar.Debugw("will not open the browser", "conf.OpenBrowser", conf.OpenBrowser,
 			"IsRunningAsGoRun", goRun)
 	}
 }

@@ -33,6 +33,7 @@ export type GraphPrefs = {
   inputURL: string
   retainedSamples: number
   sampleInterval: number
+  topN: number
 }
 
 const newGraphPrefs = (): GraphPrefs => ({
@@ -46,6 +47,7 @@ const newGraphPrefs = (): GraphPrefs => ({
   inputURL: `${8300}`, // get metrics from backend by default
   retainedSamples: 120,
   sampleInterval: 1000,
+  topN: 20,
 })
 
 const IS_CLIENT = typeof window !== 'undefined'

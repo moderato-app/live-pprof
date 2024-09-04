@@ -9,6 +9,7 @@ import { graphPrefsState } from '@/components/state/pref-state'
 import { useIsDev } from '@/components/hooks/use-is-dev'
 
 const blackHole = 'http://240.0.0.0:8300'
+
 export const useBackendURL = (): string => {
   const isDev = useIsDev()
   const isSSR = useIsSSR()
@@ -21,9 +22,9 @@ export const useBackendURL = (): string => {
   if (isDev) {
     console.info('using', process.env.NEXT_PUBLIC_BACKEND_URL, 'as backend grpc endpoint')
     return process.env.NEXT_PUBLIC_BACKEND_URL!
+  } else {
+    return `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
   }
-
-  return `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
 }
 
 export const useMetricsClient = (): MetricsClient => {

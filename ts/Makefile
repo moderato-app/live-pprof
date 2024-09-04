@@ -28,6 +28,8 @@ disable-telemetry:
 	@echo "Disabling Next.js telemetry"
 	npx next telemetry --disable
 
+analyze:
+	ANALYZE=true pnpm build
 
 clean:
 	@echo "Cleaning ts"

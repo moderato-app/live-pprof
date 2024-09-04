@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.11.1",
+    "@next/bundle-analyzer": "^14.2.8",
     "@nextui-org/accordion": "^2.0.38",
     "@nextui-org/button": "2.0.37",
     "@nextui-org/card": "^2.0.33",
