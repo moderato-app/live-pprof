@@ -1,5 +1,5 @@
 BINARY_NAME = live-pprof
-ENTRY = cmd/live-pprof/live-pprof.go
+ENTRY = ./cmd/live-pprof/live-pprof.go
 
 .PHONY: build
 

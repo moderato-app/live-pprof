@@ -1,4 +1,4 @@
-name: release
+name: Release
 
 on:
   release:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   release:
-    name: release
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
