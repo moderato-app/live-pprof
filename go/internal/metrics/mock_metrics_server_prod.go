@@ -6,8 +6,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/moderato-app/live-pprof/api"
-	"github.com/moderato-app/live-pprof/internal/logging"
+	"github.com/moderato-app/go/live-pprof/api"
+	"github.com/moderato-app/go/live-pprof/internal/logging"
 )
 
 var mockNotAvailableErr = errors.New("mock data is not available for a prod build")

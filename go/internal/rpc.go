@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	chi2 "github.com/moderato-app/live-pprof/internal/chi"
-	"github.com/moderato-app/live-pprof/internal/config"
-	"github.com/moderato-app/live-pprof/internal/logging"
+	chi2 "github.com/moderato-app/go/live-pprof/internal/chi"
+	"github.com/moderato-app/go/live-pprof/internal/config"
+	"github.com/moderato-app/go/live-pprof/internal/logging"
 	"google.golang.org/grpc"
 )
 
