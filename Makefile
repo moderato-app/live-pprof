@@ -52,3 +52,4 @@ copy:
 	fi
 	$(call print_step, Copying static files to go)
 	cp -r ts/out assets/web/html
+	zip -r assets/web/html.zip  ts/out/*
