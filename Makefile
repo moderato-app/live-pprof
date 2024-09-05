@@ -11,7 +11,7 @@ endef
 all: protoc test build
 	$(call print_step, Done)
 
-release: protoc test build-for-release zip
+release: protoc test build-for-release
 	$(call print_step, Done)
 
 protoc:
@@ -34,6 +34,7 @@ build-for-release:
 	$(call print_step, Build for releasing)
 	$(MAKE) -C ts build
 	$(MAKE) copy
+	$(MAKE) zip
 	$(MAKE) -f go.mk build-for-release
 
 clean:
