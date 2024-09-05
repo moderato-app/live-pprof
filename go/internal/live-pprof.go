@@ -16,10 +16,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-func main() {
-
-}
-
 func LivePprof() {
 	conf := config.ParseLPFlags()
 
