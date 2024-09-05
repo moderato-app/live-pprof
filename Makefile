@@ -11,7 +11,7 @@ endef
 all: protoc test build
 	$(call print_step, Done)
 
-release: protoc test build-for-release
+release: protoc test build-for-release zip
 	$(call print_step, Done)
 
 protoc:
@@ -52,4 +52,6 @@ copy:
 	fi
 	$(call print_step, Copying static files to go)
 	cp -r ts/out assets/web/html
+
+zip:
 	zip -r assets/web/html.zip  ts/out/*
