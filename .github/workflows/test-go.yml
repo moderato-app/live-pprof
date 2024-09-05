@@ -30,4 +30,4 @@ jobs:
         uses: arduino/setup-protoc@v3
 
       - name: Test
-        run: make
+        run: make -f go.mk build
