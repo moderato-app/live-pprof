@@ -6,12 +6,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/moderato-app/live-pprof/api"
-	"github.com/moderato-app/live-pprof/internal/config"
-	"github.com/moderato-app/live-pprof/internal/general"
-	"github.com/moderato-app/live-pprof/internal/logging"
-	"github.com/moderato-app/live-pprof/internal/metrics"
-	"github.com/moderato-app/live-pprof/internal/util"
+	"github.com/moderato-app/go/live-pprof/api"
+	"github.com/moderato-app/go/live-pprof/internal/config"
+	"github.com/moderato-app/go/live-pprof/internal/general"
+	"github.com/moderato-app/go/live-pprof/internal/logging"
+	"github.com/moderato-app/go/live-pprof/internal/metrics"
+	"github.com/moderato-app/go/live-pprof/internal/util"
 	"github.com/pkg/browser"
 	"google.golang.org/grpc"
 )

@@ -9,8 +9,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"github.com/moderato-app/live-pprof/assets"
-	"github.com/moderato-app/live-pprof/internal/logging"
+	"github.com/moderato-app/go/live-pprof/assets"
+	"github.com/moderato-app/go/live-pprof/internal/logging"
 )
 
 func WebServer(g *grpcweb.WrappedGrpcServer) *echo.Echo {

@@ -9,8 +9,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"github.com/moderato-app/live-pprof/assets"
-	"github.com/moderato-app/live-pprof/internal/logging"
+	"github.com/moderato-app/go/live-pprof/assets"
+	"github.com/moderato-app/go/live-pprof/internal/logging"
 )
 
 func WebServer(g *grpcweb.WrappedGrpcServer) *chi.Mux {
