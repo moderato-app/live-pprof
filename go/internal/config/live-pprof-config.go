@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/moderato-app/go/live-pprof/internal/logging"
+	"live-pprof/internal/logging"
+
 	flag "github.com/spf13/pflag"
 )
 

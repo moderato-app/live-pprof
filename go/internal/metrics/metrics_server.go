@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/moderato-app/go/live-pprof/api"
-	"github.com/moderato-app/go/live-pprof/internal/logging"
+	"live-pprof/api"
+	"live-pprof/internal/logging"
+
 	"github.com/moderato-app/pprof/moderato"
 )
 
