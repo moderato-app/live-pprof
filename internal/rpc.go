@@ -39,8 +39,11 @@ func StartServeGrpc(gs *grpc.Server, conf *config.LivePprofConfig) {
 	wrappedGrpc := grpcweb.WrapServer(gs, grpcweb.WithOriginFunc(func(origin string) bool {
 		return true
 	}))
+	s, err := chi2.WebServer(chi2.GrpcMiddleware(wrappedGrpc))
 
-	s := chi2.WebServer(wrappedGrpc)
+	if err != nil {
+		logging.Sugar.Panic("failed to init WebServer", err)
+	}
 
 	go func() {
 		if err := http.Serve(l, s); err != nil {

@@ -42,4 +42,4 @@ test:
 
 clean:
 	@echo "Cleaning go"
-	go clean; rm -rf build
+	go clean; rm -rf build; rm -rf assets/web/html
