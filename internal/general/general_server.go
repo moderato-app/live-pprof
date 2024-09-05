@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"live-pprof/api"
-	"live-pprof/internal/logging"
-	"live-pprof/internal/metrics"
+	"github.com/moderato-app/live-pprof/api"
+	"github.com/moderato-app/live-pprof/internal/logging"
+	"github.com/moderato-app/live-pprof/internal/metrics"
 )
 
 type GeneralServer struct {

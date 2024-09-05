@@ -6,10 +6,10 @@ import (
 	"net/http/pprof"
 	_ "net/http/pprof"
 
-	"live-pprof/assets"
-	"live-pprof/internal/logging"
+	"github.com/moderato-app/live-pprof/assets"
+	"github.com/moderato-app/live-pprof/internal/logging"
 
-	"github.com/go-chi/chi/v5"
+	chi "github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 )
