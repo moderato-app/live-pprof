@@ -18,16 +18,16 @@ protoc:
 
 build:
 	@echo "Building go"
-	 go build -tags prod -o build/${BINARY_NAME} ${ENTRY}
+	 go build -ldflags="-s -w" -tags prod -o build/${BINARY_NAME} ${ENTRY}
 
 build-for-release:
 	@echo "Building go for release"
-	GOOS=linux GOARCH=amd64 go build -tags prod -o build/${BINARY_NAME}-linux-amd64 ${ENTRY};
-	GOOS=linux GOARCH=arm64 go build -tags prod -o build/${BINARY_NAME}-linux-arm64 ${ENTRY};
-	GOOS=darwin GOARCH=amd64 go build -tags prod -o build/${BINARY_NAME}-darwin-amd64 ${ENTRY};
-	GOOS=darwin GOARCH=arm64 go build -tags prod -o build/${BINARY_NAME}-darwin-arm64 ${ENTRY};
-	GOOS=windows GOARCH=amd64 go build -tags prod -o build/${BINARY_NAME}-windows-amd64.exe ${ENTRY};
-	GOOS=windows GOARCH=arm64 go build -tags prod -o build/${BINARY_NAME}-windows-arm64.exe ${ENTRY};
+	GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -tags prod -o build/${BINARY_NAME}-linux-amd64 ${ENTRY};
+	GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -tags prod -o build/${BINARY_NAME}-linux-arm64 ${ENTRY};
+	GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -tags prod -o build/${BINARY_NAME}-darwin-amd64 ${ENTRY};
+	GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -tags prod -o build/${BINARY_NAME}-darwin-arm64 ${ENTRY};
+	GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -tags prod -o build/${BINARY_NAME}-windows-amd64.exe ${ENTRY};
+	GOOS=windows GOARCH=arm64 go build -ldflags="-s -w" -tags prod -o build/${BINARY_NAME}-windows-arm64.exe ${ENTRY};
 	cd build; \
 	tar -zcvf ${BINARY_NAME}-linux-amd64.tar.gz ${BINARY_NAME}-linux-amd64; \
 	tar -zcvf ${BINARY_NAME}-linux-arm64.tar.gz ${BINARY_NAME}-linux-arm64; \
