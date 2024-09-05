@@ -1,7 +1,7 @@
 **/.idea
 **/.vscode
 api/*
-live-pprof
+./live-pprof
 assets/web/html/*
 go.work
 build
