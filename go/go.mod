@@ -1,4 +1,4 @@
-module github.com/moderato-app/go/live-pprof
+module live-pprof
 
 go 1.22.6
 

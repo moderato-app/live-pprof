@@ -12,10 +12,11 @@ import (
 	"syscall"
 	"time"
 
+	chi2 "live-pprof/internal/chi"
+	"live-pprof/internal/config"
+	"live-pprof/internal/logging"
+
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	chi2 "github.com/moderato-app/go/live-pprof/internal/chi"
-	"github.com/moderato-app/go/live-pprof/internal/config"
-	"github.com/moderato-app/go/live-pprof/internal/logging"
 	"google.golang.org/grpc"
 )
 

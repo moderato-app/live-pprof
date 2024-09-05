@@ -5,8 +5,8 @@ package metrics
 import (
 	"context"
 
-	"github.com/moderato-app/go/live-pprof/api"
-	"github.com/moderato-app/go/live-pprof/internal/logging"
+	"live-pprof/api"
+	"live-pprof/internal/logging"
 )
 
 // MockMetricsServer returns mock data instead of real data to save development time

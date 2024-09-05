@@ -9,8 +9,9 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/moderato-app/go/live-pprof/assets"
-	"github.com/moderato-app/go/live-pprof/internal/logging"
+	"live-pprof/assets"
+	"live-pprof/internal/logging"
+
 	"github.com/moderato-app/pprof/moderato"
 )
 

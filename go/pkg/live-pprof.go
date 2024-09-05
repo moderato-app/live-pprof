@@ -1,4 +1,4 @@
-package internal
+package pkg
 
 import (
 	"net/url"
@@ -6,12 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/moderato-app/go/live-pprof/api"
-	"github.com/moderato-app/go/live-pprof/internal/config"
-	"github.com/moderato-app/go/live-pprof/internal/general"
-	"github.com/moderato-app/go/live-pprof/internal/logging"
-	"github.com/moderato-app/go/live-pprof/internal/metrics"
-	"github.com/moderato-app/go/live-pprof/internal/util"
+	"live-pprof/api"
+	"live-pprof/internal"
+	"live-pprof/internal/config"
+	"live-pprof/internal/general"
+	"live-pprof/internal/logging"
+	"live-pprof/internal/metrics"
+	"live-pprof/internal/util"
+
 	"github.com/pkg/browser"
 	"google.golang.org/grpc"
 )
@@ -31,7 +33,7 @@ func LivePprof() {
 		maybeOpenURL(conf)
 	}()
 
-	StartServeGrpc(grpcServer, conf)
+	internal.StartServeGrpc(grpcServer, conf)
 }
 
 func maybeOpenURL(conf *config.LivePprofConfig) {
