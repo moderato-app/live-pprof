@@ -1,4 +1,4 @@
-package cmd
+package internal
 
 import (
 	"net/url"
@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/moderato-app/live-pprof/api"
-	"github.com/moderato-app/live-pprof/internal"
 	"github.com/moderato-app/live-pprof/internal/config"
 	"github.com/moderato-app/live-pprof/internal/general"
 	"github.com/moderato-app/live-pprof/internal/logging"
@@ -16,6 +15,10 @@ import (
 	"github.com/pkg/browser"
 	"google.golang.org/grpc"
 )
+
+func main() {
+
+}
 
 func LivePprof() {
 	conf := config.ParseLPFlags()
@@ -32,7 +35,7 @@ func LivePprof() {
 		maybeOpenURL(conf)
 	}()
 
-	internal.StartServeGrpc(grpcServer, conf)
+	StartServeGrpc(grpcServer, conf)
 }
 
 func maybeOpenURL(conf *config.LivePprofConfig) {

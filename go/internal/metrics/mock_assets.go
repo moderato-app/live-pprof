@@ -8,7 +8,6 @@ import (
 	"sync/atomic"
 
 	"github.com/moderato-app/live-pprof/assets"
-	"github.com/moderato-app/live-pprof/internal"
 	"github.com/moderato-app/live-pprof/internal/logging"
 	"github.com/moderato-app/pprof/moderato"
 )
@@ -74,19 +73,19 @@ func newMockAssets() *MockAssets {
 	return m
 }
 
-func (m *MockAssets) GetMetrics(mt internal.MetricsType) (*moderato.Metrics, error) {
+func (m *MockAssets) GetMetrics(mt MetricsType) (*moderato.Metrics, error) {
 
 	m.loadProfilesOnce()
 
 	cnt := m.mockCount.Add(1)
 	var profile []byte
-	if mt == internal.MetricsTypeHeap {
+	if mt == MetricsTypeHeap {
 		profile = m.heapProfiles[cnt%int64(len(m.cpuProfiles))]
-	} else if mt == internal.MetricsTypeCPU {
+	} else if mt == MetricsTypeCPU {
 		profile = m.cpuProfiles[cnt%int64(len(m.cpuProfiles))]
-	} else if mt == internal.MetricsTypeAllocs {
+	} else if mt == MetricsTypeAllocs {
 		profile = m.allocsProfiles[cnt%int64(len(m.allocsProfiles))]
-	} else if mt == internal.MetricsTypeGoroutine {
+	} else if mt == MetricsTypeGoroutine {
 		profile = m.goroutineProfiles[cnt%int64(len(m.goroutineProfiles))]
 	} else {
 		return nil, errors.New("invalid fetch type")

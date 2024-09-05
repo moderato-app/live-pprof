@@ -1,15 +1,16 @@
-name: Build binary
+name: release
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  release:
+    types: [ published ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build_binary:
-    name: Build binary
+  release:
+    name: release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,12 +41,14 @@ jobs:
         uses: arduino/setup-protoc@v3
 
       - name: Build binary
-        run: make
+        run: make release
 
-      - name: Upload
-        uses: actions/upload-artifact@v4
+      - name: ls go/build
+        run: ls go/build
+
+      - name: Upload the artifacts
+        uses: skx/github-action-publish-binaries@release-2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: live-pprof
-          path: build/live-pprof
-          compression-level: 9
-          retention-days: 10
+          args: 'go/build/*.tar.gz  go/build/*.zip'

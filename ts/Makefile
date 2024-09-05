@@ -1,4 +1,5 @@
 # mode=grpcwebtext prevents client from receiving all the messages at once when using streaming
+.PHONY: build
 
 all: protoc disable-telemetry test build
 

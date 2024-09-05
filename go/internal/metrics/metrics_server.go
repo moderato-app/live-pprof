@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/moderato-app/live-pprof/api"
-	"github.com/moderato-app/live-pprof/internal"
 	"github.com/moderato-app/live-pprof/internal/logging"
 	"github.com/moderato-app/pprof/moderato"
 )
@@ -23,26 +22,26 @@ func NewMetricsServer() *MetricsServer {
 
 func (m *MetricsServer) HeapMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	logging.Sugar.Debug("HeapMetrics req:", req)
-	return dispatch(ctx, req, internal.MetricsTypeHeap)
+	return dispatch(ctx, req, MetricsTypeHeap)
 }
 
 func (m *MetricsServer) CPUMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	logging.Sugar.Debug("CPUMetrics req:", req)
-	return dispatch(ctx, req, internal.MetricsTypeCPU)
+	return dispatch(ctx, req, MetricsTypeCPU)
 }
 
 func (m *MetricsServer) AllocsMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	logging.Sugar.Debug("AllocsMetrics req:", req)
-	return dispatch(ctx, req, internal.MetricsTypeAllocs)
+	return dispatch(ctx, req, MetricsTypeAllocs)
 }
 
 func (m *MetricsServer) GoroutineMetrics(ctx context.Context, req *api.GoMetricsRequest) (*api.GoMetricsResponse, error) {
 	logging.Sugar.Debug("GoroutineMetrics req:", req)
-	return dispatch(ctx, req, internal.MetricsTypeGoroutine)
+	return dispatch(ctx, req, MetricsTypeGoroutine)
 }
 
-func dispatch(ctx context.Context, req *api.GoMetricsRequest, mt internal.MetricsType) (*api.GoMetricsResponse, error) {
-	u, err := internal.MetricsURL(req.Url, mt, false)
+func dispatch(ctx context.Context, req *api.GoMetricsRequest, mt MetricsType) (*api.GoMetricsResponse, error) {
+	u, err := MetricsURL(req.Url, mt, false)
 	if err != nil {
 		logging.Sugar.Error(err)
 		return nil, err

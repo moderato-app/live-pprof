@@ -4,3 +4,4 @@ api/*
 live-pprof
 assets/web/html/*
 go.work
+build

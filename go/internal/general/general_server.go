@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/moderato-app/live-pprof/api"
-	"github.com/moderato-app/live-pprof/internal"
 	"github.com/moderato-app/live-pprof/internal/logging"
+	"github.com/moderato-app/live-pprof/internal/metrics"
 )
 
 type GeneralServer struct {
@@ -24,17 +24,17 @@ func NewGeneralServer() *GeneralServer {
 func (m *GeneralServer) DetectURL(req *api.DetectURLRequest, stream api.General_DetectURLServer) error {
 	logging.Sugar.Debug("DetectURL req:", req)
 	wg := sync.WaitGroup{}
-	mts := [...]internal.MetricsType{
-		internal.MetricsTypeHeap,
-		internal.MetricsTypeCPU,
-		internal.MetricsTypeAllocs,
-		internal.MetricsTypeGoroutine,
+	mts := [...]metrics.MetricsType{
+		metrics.MetricsTypeHeap,
+		metrics.MetricsTypeCPU,
+		metrics.MetricsTypeAllocs,
+		metrics.MetricsTypeGoroutine,
 	}
 
 	urls := make([]string, 0, 5)
 	urls = append(urls, req.Url)
 	for _, mt := range mts {
-		url, err := internal.MetricsURL(req.Url, mt, true)
+		url, err := metrics.MetricsURL(req.Url, mt, true)
 		if err != nil {
 			logging.Sugar.Error(err)
 			panic(err)
