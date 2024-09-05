@@ -5,3 +5,7 @@ node_modules
 go.work
 package.json
 pnpm-lock.yaml
+api/*
+live-pprof
+assets/web/html/*
+build

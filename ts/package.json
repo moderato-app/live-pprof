@@ -1,5 +1,5 @@
 {
-  "name": "live-pprof",
+  "name": "github.com/moderato-app/live-pprof",
   "version": "0.0.1",
   "private": false,
   "scripts": {

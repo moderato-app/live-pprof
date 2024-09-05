@@ -4,15 +4,13 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - go/**
-      - proto/**
-      - .github/**
+      - '**'
+      - '!ts/**'
   pull_request:
     branches: [ "main" ]
     paths:
-      - go/**
-      - proto/**
-      - .github/**
+      - '**'
+      - '!ts/**'
   workflow_dispatch:
 
 jobs:
@@ -26,10 +24,10 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: '^1.23'
-          cache-dependency-path: "go/go.sum"
+          cache-dependency-path: "go.sum"
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
 
       - name: Test
-        run: cd go && make
+        run: make

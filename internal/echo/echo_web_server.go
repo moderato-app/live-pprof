@@ -4,12 +4,12 @@ import (
 	"io/fs"
 	"net/http"
 
-	"live-pprof/assets"
-	"live-pprof/internal/logging"
+	"github.com/moderato-app/live-pprof/assets"
+	"github.com/moderato-app/live-pprof/internal/logging"
 
 	"github.com/brpaz/echozap"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 )
