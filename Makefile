@@ -34,6 +34,7 @@ build-for-release:
 	$(call print_step, Build for releasing)
 	$(MAKE) -C ts build
 	$(MAKE) copy
+	$(MAKE) zip
 	$(MAKE) -f go.mk build-for-release
 
 clean:
@@ -52,3 +53,6 @@ copy:
 	fi
 	$(call print_step, Copying static files to go)
 	cp -r ts/out assets/web/html
+
+zip:
+	zip -r assets/web/html.zip  ts/out/*

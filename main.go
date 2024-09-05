@@ -1,7 +1,9 @@
 package main
 
-import "github.com/moderato-app/live-pprof/pkg"
+import (
+	"github.com/moderato-app/live-pprof/internal"
+)
 
 func main() {
-	pkg.LivePprof()
+	internal.LivePprof()
 }
