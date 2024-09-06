@@ -12,7 +12,7 @@ go install github.com/moderato-app/live-pprof@v1
 
 ## Usage
 
-#### Step 1: Setup pprof endpoints
+#### Step 1: setup pprof endpoints
 
 ```bash
 package main
@@ -28,7 +28,7 @@ func main() {
 }
 ```
 
-#### Step 2: Monitor the pprof endpoints
+#### Step 2: monitor the pprof endpoints
 
 ```bash
 live-pprof 6060 
