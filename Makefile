@@ -8,10 +8,10 @@ define print_step
 endef
 .PHONY: build
 
-all: protoc test build
+all: protoc build
 	$(call print_step, Done)
 
-release: protoc test build-for-release
+release: protoc build-for-release
 	$(call print_step, Done)
 
 protoc:
@@ -23,6 +23,10 @@ test:
 	$(call print_step, Testing)
 	$(MAKE) -f go.mk test
 	$(MAKE) -C ts test
+
+test-e2e:
+	$(call print_step, Testing e2e)
+	$(MAKE) -f go.mk test-e2e
 
 build:
 	$(call print_step, Building)

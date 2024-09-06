@@ -9,7 +9,11 @@ permissions:
   contents: write
 
 jobs:
+  testing:
+    uses: ./.github/workflows/test-unit-and-e2e.yml
+
   release:
+    needs: [ testing ]
     name: Release
     runs-on: ubuntu-latest
     steps:
@@ -43,8 +47,8 @@ jobs:
       - name: Build binary
         run: make release
 
-      - name: ls build
-        run: ls build
+      - name: ls ./build
+        run: ls ./build
 
       - name: Upload the artifacts
         uses: skx/github-action-publish-binaries@release-2.0

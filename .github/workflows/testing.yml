@@ -1,4 +1,4 @@
-name: Test e2e
+name: Unit testing and E2E testing
 
 on:
   push:
@@ -14,8 +14,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  test_e2e:
-    name: Test e2e
+  testing:
+    name: Unit testing and E2E testing
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,9 +45,27 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
 
-      - name: Build release binary
-        run: make release
+      - name: Unit testing
+        run: make protoc && make test
 
-      - name: Test
-        run: make -f go.mk test-e2ef
+      - name: Build binary
+        run: make build
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-pprof
+          path: build/live-pprof
+          compression-level: 9
+          retention-days: 10
+
+      - name: E2E testing with binary
+        run: make test-e2e
+
+      - name: Build binary for release
+        run: make clean && make release
+
+      - name: E2E testing with binary for release
+        run: make test-e2e
+
 

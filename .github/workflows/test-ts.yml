@@ -1,18 +1,18 @@
 name: Test TS
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - ts/**
-      - proto/**
-      - .github/**
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - ts/**
-      - proto/**
-      - .github/**
+#  push:
+#    branches: [ "main" ]
+#    paths:
+#      - ts/**
+#      - proto/**
+#      - .github/**
+#  pull_request:
+#    branches: [ "main" ]
+#    paths:
+#      - ts/**
+#      - proto/**
+#      - .github/**
   workflow_dispatch:
 
 jobs:
