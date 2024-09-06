@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   testing:
-    uses: ./.github/workflows/test-unit-and-e2e.yml
+    uses: ./.github/workflows/testing.yml
 
   release:
     needs: [ testing ]
