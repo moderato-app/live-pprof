@@ -1,18 +1,18 @@
-'use client'
-import prettyBytes from 'pretty-bytes'
-import { useSnapshot } from 'valtio/react'
-import { EChartsOption } from 'echarts-for-react/src/types'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { DatasetComponentOption } from 'echarts/components'
-import { SeriesOption } from 'echarts'
-import _ from 'lodash'
+"use client"
+import prettyBytes from "pretty-bytes"
+import { useSnapshot } from "valtio/react"
+import { EChartsOption } from "echarts-for-react/src/types"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { DatasetComponentOption } from "echarts/components"
+import { SeriesOption } from "echarts"
+import _ from "lodash"
 
-import { uiState } from '@/components/state/ui-state'
-import { dispatchGraphPrefProxy, FlatOrCum, graphPrefsState } from '@/components/state/pref-state'
-import { useBasicOption } from '@/components/hooks/use-basic-option'
-import prettyTime from '@/components/util/prettyTime'
-import { PprofType, useGraphData } from '@/components/hooks/use-graph-data'
-import { myEmitter } from '@/components/state/emitter'
+import { uiState } from "@/components/state/ui-state"
+import { dispatchGraphPrefProxy, FlatOrCum, graphPrefsState } from "@/components/state/pref-state"
+import { useBasicOption } from "@/components/hooks/use-basic-option"
+import prettyTime from "@/components/util/prettyTime"
+import { PprofType, useGraphData } from "@/components/hooks/use-graph-data"
+import { myEmitter } from "@/components/state/emitter"
 
 type PprofProps = {
   pprofType: PprofType
@@ -33,14 +33,14 @@ export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOptio
 
   useEffect(() => {
     const incr = () => setClearCount(count => count + 1)
-    myEmitter.on('clearData', incr)
-    return () => myEmitter.on('clearData', incr)
+    myEmitter.on("clearData", incr)
+    return () => myEmitter.on("clearData", incr)
   }, [])
 
   const dataset: DatasetComponentOption[] = useMemo(() => {
     return Object.keys(graphData.lineTable).map(key => ({
       id: key,
-      source: graphData.lineTable[key].points,
+      source: graphData.lineTable[key].points
     }))
   }, [graphData])
 
@@ -49,25 +49,25 @@ export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOptio
   const seriesList: SeriesOption[] = useMemo(
     () =>
       keys
-        .filter(key => total || key !== 'total ')
+        .filter(key => total || key !== "total ")
         .map(key => ({
-          type: 'line',
+          type: "line",
           datasetId: key,
           showSymbol: false,
           name: key,
           smooth: smooth,
           labelLayout: {
-            moveOverlap: 'shiftY',
+            moveOverlap: "shiftY"
           },
           emphasis: {
-            focus: 'series',
+            focus: "series"
           },
           encode: {
-            x: 'date',
+            x: "date",
             y: flatOrCum.toLowerCase(),
-            itemName: 'date',
-            tooltip: [flatOrCum.toLowerCase()],
-          },
+            itemName: "date",
+            tooltip: [flatOrCum.toLowerCase()]
+          }
         })),
     [keys, smooth, total, flatOrCum]
   )
@@ -76,23 +76,23 @@ export const usePprofOption = ({ pprofType }: PprofProps): [option: EChartsOptio
   const option = {
     ...bo,
     title: {
-      text: pprofType,
+      text: pprofType
     },
     dataset: dataset,
     series: seriesList,
     xAxis: {
-      type: 'time',
-      nameLocation: 'middle',
+      type: "time",
+      nameLocation: "middle"
     },
     yAxis: {
       axisLabel: {
-        formatter: labelFmt,
-      },
+        formatter: labelFmt
+      }
     },
     tooltip: {
       ...bo.tooltip,
-      formatter: tooltipFmt,
-    },
+      formatter: tooltipFmt
+    }
   }
 
   return [option, refreshKey]
@@ -112,7 +112,7 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
     const tooLong = params.length > 20
 
     if (!params[0]) {
-      return ''
+      return ""
     }
     let output = `
 <div class="tooltip"> 
@@ -124,7 +124,7 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
 `
     params.slice(0, 20).forEach(p => {
       const value = p.value[foc.toLowerCase()]
-      const splits = p.seriesName.split(' ')
+      const splits = p.seriesName.split(" ")
       const func = splits[0]
       if (value) {
         output += `<div class="flex flex-col gap-0.5">
@@ -143,18 +143,18 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
     })
     if (tooLong) output += `<div>…showing 20 of ${params.length}…</div>`
 
-    return output + '</div></div>'
+    return output + "</div></div>"
   }
 }
 
 const labelFormatter = (pprofType: PprofType): ((value: number) => string) => {
   switch (pprofType) {
     case PprofType.cpu:
-      return (value: number) => (isNaN(value) ? '' : prettyTime(value / 1e6))
+      return (value: number) => (isNaN(value) ? "" : prettyTime(value / 1e6, { short: true }))
     case PprofType.allocs:
     case PprofType.heap:
-      return (value: number) => (isNaN(value) ? '' : prettyBytes(value))
+      return (value: number) => (isNaN(value) ? "" : prettyBytes(value))
     case PprofType.goroutine:
-      return (value: number) => (isNaN(value) ? '' : `${value}`)
+      return (value: number) => (isNaN(value) ? "" : `${value}`)
   }
 }

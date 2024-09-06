@@ -1,25 +1,26 @@
-'use client'
-import { useEffect, useState } from 'react'
-import grpcWeb from 'grpc-web'
-import { useSnapshot } from 'valtio/react'
-import dayjs from 'dayjs'
-import { defer } from 'lodash'
+"use client"
+import { useEffect, useState } from "react"
+import grpcWeb from "grpc-web"
+import { useSnapshot } from "valtio/react"
+import dayjs from "dayjs"
+import { defer } from "lodash"
 
-import { GraphData, newGraphData } from '@/components/charts/data-structure'
-import { useMetricsClient } from '@/components/client/metrics'
-import * as api_pb from '@/components/api/api_pb'
-import { GoMetricsRequest, GoMetricsResponse } from '@/components/api/api_pb'
-import { appendGraphData } from '@/components/charts/data-operation'
-import { recorderState, resetRecorder } from '@/components/state/recorder-state'
-import { myEmitter } from '@/components/state/emitter'
-import { useURL } from '@/components/hooks/use-url'
-import { dispatchGraphPrefProxy, graphPrefsState } from '@/components/state/pref-state'
+import { GraphData, newGraphData } from "@/components/charts/data-structure"
+import { useMetricsClient } from "@/components/client/metrics"
+import * as api_pb from "@/components/api/api_pb"
+import { GoMetricsRequest, GoMetricsResponse } from "@/components/api/api_pb"
+import { appendGraphData } from "@/components/charts/data-operation"
+import { recorderState, resetRecorder } from "@/components/state/recorder-state"
+import { myEmitter } from "@/components/state/emitter"
+import { useURL } from "@/components/hooks/use-url"
+import { dispatchGraphPrefProxy, graphPrefsState } from "@/components/state/pref-state"
+import { useProfileDuration } from "@/components/hooks/use-profile-duration"
 
 export enum PprofType {
-  cpu = 'CPU',
-  heap = 'Heap',
-  allocs = 'Allocs',
-  goroutine = 'Goroutine',
+  cpu = "CPU",
+  heap = "Heap",
+  allocs = "Allocs",
+  goroutine = "Goroutine"
 }
 
 export type GraphDataProps = {
@@ -33,24 +34,27 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
   const { isRecording } = useSnapshot(recorderState)
   const { retainedSamples, sampleInterval } = useSnapshot(graphPrefsState)
   const { topN } = useSnapshot(dispatchGraphPrefProxy(pprofType))
+  const { seconds } = useProfileDuration()
+
+  // use this to trigger the useEffect to make a new request
+  const [nextReqSignal, setNextReqSignal] = useState(1)
 
   useEffect(() => {
     const clearData = () => {
       setGraphData(newGraphData())
       resetRecorder()
     }
-    myEmitter.on('clearData', clearData)
-    return () => myEmitter.on('clearData', clearData)
+    myEmitter.on("clearData", clearData)
+    return () => myEmitter.on("clearData", clearData)
   }, [setGraphData])
 
   useEffect(() => {
     if (!isRecording) return
-    if (typeof url !== 'string') {
+    if (typeof url !== "string") {
       return
     }
-    let u = url
+
     const streams: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>[] = []
-    const cbs: NodeJS.Timeout[] = []
     let t: NodeJS.Timeout
     let lastRequest = dayjs()
 
@@ -58,13 +62,16 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
       const callback = (err: grpcWeb.RpcError, response: GoMetricsResponse) => {
         defer(() => {
           let waitForMs = sampleInterval
-          // cpu request takes about 1 second to complete, so there is no need to wait for 1 second again,
-          // but we need to wait if cpu request fails too fast
-          if (pprofType === PprofType.cpu && dayjs().diff(lastRequest, 'millisecond') > sampleInterval) {
+          // since cpu request takes about sampleInterval ms to complete,
+          // there is no need to wait for sampleInterval ms again.
+          // Still we need to wait if cpu request fails too fast
+          if (pprofType === PprofType.cpu && dayjs().diff(lastRequest, "millisecond") > sampleInterval) {
             waitForMs = 0
           }
-          t = setTimeout(makeRequest, waitForMs)
-          cbs.push(t)
+          // prepare fot next request
+          t = setTimeout(() => {
+            setNextReqSignal(v => v + 1)
+          }, waitForMs)
         })
 
         // remove stream from the list
@@ -84,11 +91,18 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
       }
 
       let stream: grpcWeb.ClientReadableStream<api_pb.GoMetricsResponse>
-      const meta = { deadline: dayjs().add(5, 'seconds').toDate().getTime().toString() }
+      const meta = {
+        deadline: dayjs()
+          .add(seconds + 5, "seconds")
+          .toDate()
+          .getTime()
+          .toString()
+      }
       lastRequest = dayjs()
-      const req = new GoMetricsRequest().setUrl(u)
+      const req = new GoMetricsRequest().setUrl(url)
       switch (pprofType) {
         case PprofType.cpu:
+          req.setProfileSeconds(seconds)
           stream = client.cPUMetrics(req, meta, callback)
           break
         case PprofType.heap:
@@ -103,7 +117,7 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
       }
       streams.push(stream)
       if (streams.length > 5) {
-        console.warn('${metricsFunc} created too many concurrent streams. consider set a timeout for each stream')
+        console.warn(`${pprofType} created too many concurrent streams. Consider setting a timeout for each stream`)
       }
     }
 
@@ -112,9 +126,8 @@ export const useGraphData = ({ pprofType }: GraphDataProps): GraphData => {
     return () => {
       clearTimeout(t)
       streams.forEach(p => p.cancel())
-      cbs.forEach(t => clearTimeout(t))
     }
-  }, [client, isRecording, url, sampleInterval, retainedSamples, topN])
+  }, [client, isRecording, url, sampleInterval, retainedSamples, topN, nextReqSignal, seconds])
 
   return graphData
 }

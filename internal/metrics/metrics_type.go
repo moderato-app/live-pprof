@@ -3,6 +3,7 @@ package metrics
 import (
 	"errors"
 	"net/url"
+	"strconv"
 )
 
 type MetricsType string
@@ -18,10 +19,10 @@ const (
 //
 // If debug is true, it fetches data in text format(except for MetricsTypeCPU).
 // If debug is false, it fetches data in pb.gz format.
-func MetricsURL(baseUrl string, mt MetricsType, debug bool) (string, error) {
-	parse, err := url.Parse(baseUrl)
+func MetricsURL(debug bool, mt MetricsType, urlStr string, profileSeconds uint64) (string, error) {
+	parse, err := url.Parse(urlStr)
 	if err != nil {
-		return "", errors.New("invalid url: " + baseUrl)
+		return "", errors.New("invalid url: " + urlStr)
 	}
 
 	var p *url.URL
@@ -30,7 +31,11 @@ func MetricsURL(baseUrl string, mt MetricsType, debug bool) (string, error) {
 	p = parse.JoinPath(string(mt))
 
 	if mt == MetricsTypeCPU {
-		params.Add("seconds", "1")
+		var sec = uint64(1)
+		if profileSeconds > 1 {
+			sec = profileSeconds
+		}
+		params.Add("seconds", strconv.Itoa(int(sec)))
 	} else if debug {
 		params.Add("debug", "1")
 	}

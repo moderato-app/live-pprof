@@ -24,6 +24,8 @@ service General {
 
 message GoMetricsRequest {
   string url = 1;
+  // cpu profile only
+  uint64 profile_seconds = 2;
 }
 
 message GoMetricsResponse {

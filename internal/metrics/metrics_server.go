@@ -42,7 +42,7 @@ func (m *MetricsServer) GoroutineMetrics(ctx context.Context, req *api.GoMetrics
 }
 
 func dispatch(ctx context.Context, req *api.GoMetricsRequest, mt MetricsType) (*api.GoMetricsResponse, error) {
-	u, err := MetricsURL(req.Url, mt, false)
+	u, err := MetricsURL(false, mt, req.Url, req.ProfileSeconds)
 	if err != nil {
 		logging.Sugar.Error(err)
 		return nil, err
