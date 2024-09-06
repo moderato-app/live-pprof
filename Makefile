@@ -59,4 +59,6 @@ copy:
 	cp -r ts/out assets/web/html
 
 zip:
-	zip -r assets/web/html.zip  ts/out/*
+	rm assets/web/html.zip
+	# this won't work as it creates ts/out entry in the .zip: zip -r assets/web/html.zip  ts/out/*
+	cd ts/out && zip -r ../../assets/web/html.zip ./*
