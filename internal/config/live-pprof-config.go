@@ -25,13 +25,17 @@ func ParseLPFlags() *LivePprofConfig {
 	flag.StringVar(&config.Host, "host", "0.0.0.0", "host to listen on")
 	flag.BoolVarP(&help, "help", "h", false, "help")
 
-	flag.BoolVarP(&config.OpenBrowser, "open-browser", "o", true, "open browser on startup")
+	flag.BoolVarP(&config.OpenBrowser, "no-browser", "n", false, "don't open browser")
 
 	flag.Parse()
 
 	args := flag.Args()
-	if len(args) > 0 {
+	if len(args) == 1 {
 		config.PprofURL = args[0]
+	} else if len(args) > 1 {
+		_, _ = fmt.Fprintf(os.Stderr, "Expected 0 or 1 arg, but %d were given: %v\n", len(args), args)
+		config.printHelp()
+		os.Exit(0)
 	}
 
 	if help {
@@ -47,10 +51,23 @@ func (config *LivePprofConfig) printHelp() {
 	fmt.Println()
 	fmt.Println("Usage Example:")
 	fmt.Println("  live-pprof")
-	fmt.Println("  live-pprof 8080")
-	fmt.Println("  live-pprof localhost:8080")
-	fmt.Println("  live-pprof http://localhost:8080")
-	fmt.Println("  live-pprof http://localhost:8080/debug/pprof")
+	fmt.Println("      open the browser and wait for instructions")
 	fmt.Println()
+	fmt.Println("  live-pprof 8080")
+	fmt.Println("      open the browser and start to monitor http://localhost:8080/debug/pprof")
+	fmt.Println("      equivalent to `live-pprof http://localhost:8080/debug/pprof`")
+	fmt.Println("  live-pprof localhost:8080")
+	fmt.Println("      open the browser and start to monitor http://localhost:8080")
+	fmt.Println("  live-pprof http://localhost:8080")
+	fmt.Println("      open the browser and start to monitor http://localhost:8080")
+	fmt.Println("  live-pprof https://example.com/perf")
+	fmt.Println("      open the browser and start to monitor https://example.com/perf")
+	fmt.Println()
+	fmt.Println("  live-pprof -n")
+	fmt.Println("      don't open the browser")
+	fmt.Println("  live-pprof --host 192.168.0.200 -port 1800")
+	fmt.Println("      listen on 192.168.0.200:1800")
+	fmt.Println()
+	fmt.Println("Help")
 	flag.PrintDefaults()
 }
