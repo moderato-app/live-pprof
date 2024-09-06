@@ -13,8 +13,8 @@ type LivePprofConfig struct {
 	Host string
 	Port uint
 
-	PprofURL    string
-	OpenBrowser bool
+	PprofURL  string
+	NoBrowser bool
 }
 
 func ParseLPFlags() *LivePprofConfig {
@@ -25,7 +25,7 @@ func ParseLPFlags() *LivePprofConfig {
 	flag.StringVar(&config.Host, "host", "0.0.0.0", "host to listen on")
 	flag.BoolVarP(&help, "help", "h", false, "help")
 
-	flag.BoolVarP(&config.OpenBrowser, "no-browser", "n", false, "don't open browser")
+	flag.BoolVarP(&config.NoBrowser, "no-browser", "n", false, "don't open browser")
 
 	flag.Parse()
 

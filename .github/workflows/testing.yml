@@ -1,21 +1,21 @@
-name: Build binary
+name: Unit testing and E2E testing
 
 on:
-#  push:
-#    branches: [ "main" ]
-#    paths:
-#      - '**'
-#      - '!README.md'
-#  pull_request:
-#    branches: [ "main" ]
-#    paths:
-#      - '**'
-#      - '!README.md'
+  push:
+    branches: [ "main" ]
+    paths:
+      - '**'
+      - '!README.md'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '**'
+      - '!README.md'
   workflow_dispatch:
 
 jobs:
-  build_binary:
-    name: Build binary
+  testing:
+    name: Unit testing and E2E testing
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,13 +45,27 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
 
-      - name: Build binary
-        run: make
+      - name: Unit testing
+        run: make protoc && make test
 
-      - name: Upload
+      - name: Build binary
+        run: make build
+
+      - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: live-pprof
           path: build/live-pprof
           compression-level: 9
           retention-days: 10
+
+      - name: E2E testing with binary
+        run: make test-e2e
+
+      - name: Build binary for release
+        run: make clean && make release
+
+      - name: E2E testing with binary for release
+        run: make test-e2e
+
+
