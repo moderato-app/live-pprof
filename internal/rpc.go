@@ -26,7 +26,7 @@ func StartServeGrpc(gs *grpc.Server, conf *config.LivePprofConfig) {
 		logging.Sugar.Fatal(err)
 	}
 
-	logging.Sugar.Info("listening on", l.Addr().String())
+	logging.Sugar.Infof("listening on %s", l.Addr().String())
 	addr := fmt.Sprintf("%s:%d", strings.Replace(conf.Host, "0.0.0.0", "localhost", 1), port)
 
 	//goland:noinspection HttpUrlsUsage

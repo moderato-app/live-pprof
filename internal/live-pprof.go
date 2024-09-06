@@ -37,23 +37,23 @@ func LivePprof() {
 
 func maybeOpenURL(conf *config.LivePprofConfig) {
 	goRun := util.IsRunningAsGoRun()
-	if conf.OpenBrowser && !goRun {
-		u := url.URL{
-			Scheme: "http",
-			Host:   strings.Replace(conf.Host, "0.0.0.0", "localhost", 1) + ":" + strconv.Itoa(int(conf.Port)),
-		}
-
-		params := url.Values{}
-		if conf.PprofURL != "" {
-			params.Add("pprof-url", conf.PprofURL)
-		}
-		u.RawQuery = params.Encode()
-
-		logging.Sugar.Infof("opening %s in the browser\n", u.String())
-
-		_ = browser.OpenURL(u.String())
-	} else {
-		logging.Sugar.Debugw("will not open the browser", "conf.OpenBrowser", conf.OpenBrowser,
+	if conf.NoBrowser || goRun {
+		logging.Sugar.Debugw("will not open the browser", "conf.NoBrowser", conf.NoBrowser,
 			"IsRunningAsGoRun", goRun)
+		return
 	}
+	u := url.URL{
+		Scheme: "http",
+		Host:   strings.Replace(conf.Host, "0.0.0.0", "localhost", 1) + ":" + strconv.Itoa(int(conf.Port)),
+	}
+
+	params := url.Values{}
+	if conf.PprofURL != "" {
+		params.Add("pprof-url", conf.PprofURL)
+	}
+	u.RawQuery = params.Encode()
+
+	logging.Sugar.Infof("opening %s in the browser\n", u.String())
+
+	_ = browser.OpenURL(u.String())
 }

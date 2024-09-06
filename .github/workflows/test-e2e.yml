@@ -1,0 +1,24 @@
+name: Test e2e
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '!README.md'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '!README.md'
+  workflow_dispatch:
+
+jobs:
+  test_e2e:
+    name: Test e2e
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: ./.github/workflows/build-composite.yml
+
+      - name: Test
+        run: make -f go.mk test-e2ef
+
