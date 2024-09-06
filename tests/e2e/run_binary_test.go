@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//goland:noinspection HttpUrlsUsage
 func TestRunBinary(t *testing.T) {
 
 	binary, err := FindBinary(t)
@@ -32,7 +33,6 @@ func TestRunBinary(t *testing.T) {
 	assert.True(t, LogContainsText(c.Status(), "listening on localhost:12345") ||
 		LogContainsText(c.Status(), "listening on 127.0.0.1:12345"), WhatsWrong(c.Status()))
 
-	//goland:noinspection HttpUrlsUsage
 	url := fmt.Sprintf("http://%s:%d", host, port)
 
 	Test(t,
@@ -40,5 +40,15 @@ func TestRunBinary(t *testing.T) {
 		Get(url),
 		Expect().Status().Equal(http.StatusOK),
 		Expect().Body().String().Contains("Live pprof"),
+	)
+
+	url = fmt.Sprintf("http://%s:%d/favicon.ico", host, port)
+
+	Test(t,
+		Description("Get favicon.ico: "+url),
+		Get(url),
+		Expect().Status().Equal(http.StatusOK),
+		Expect().Headers("content-type").First().Contains("image"),
+		Expect().Body().Bytes().Len().GreaterThan(0),
 	)
 }
