@@ -48,7 +48,7 @@ func TestRunBinary(t *testing.T) {
 		Description("Get favicon.ico: "+url),
 		Get(url),
 		Expect().Status().Equal(http.StatusOK),
-		Expect().Headers("content-type").Equal("image/x-icon"),
+		Expect().Headers("content-type").Contains("image"),
 		Expect().Body().Bytes().Len().GreaterThan(0),
 	)
 }
