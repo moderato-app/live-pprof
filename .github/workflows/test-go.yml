@@ -6,11 +6,13 @@ on:
     paths:
       - '**'
       - '!ts/**'
+      - '!README.md'
   pull_request:
     branches: [ "main" ]
     paths:
       - '**'
       - '!ts/**'
+      - '!README.md'
   workflow_dispatch:
 
 jobs:
