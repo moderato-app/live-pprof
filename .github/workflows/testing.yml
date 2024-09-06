@@ -47,10 +47,7 @@ jobs:
         uses: arduino/setup-protoc@v3
 
       - name: Unit testing
-        run: make protoc && make test
-
-      - name: Build binary
-        run: make build
+        run: make test
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
@@ -60,13 +57,6 @@ jobs:
           compression-level: 9
           retention-days: 10
 
-      - name: E2E testing with binary
-        run: make test-e2e
-
-      - name: Build binary for release
-        run: make clean && make release
-
-      - name: E2E testing with binary for release
-        run: make test-e2e
-
+      - name: E2E testing
+        run: make clean test-e2e
 
