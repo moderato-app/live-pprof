@@ -1,15 +1,18 @@
-'use client'
-import { Checkbox } from '@nextui-org/checkbox'
-import { Select, SelectItem } from '@nextui-org/select'
-import React from 'react'
-import { useSnapshot } from 'valtio/react'
-import clsx from 'clsx'
-import { Tooltip } from '@nextui-org/tooltip'
-import { useIsSSR } from '@react-aria/ssr'
-import { Divider } from '@nextui-org/divider'
+"use client"
+import { Checkbox } from "@nextui-org/checkbox"
+import { Select, SelectItem } from "@nextui-org/select"
+import React from "react"
+import { useSnapshot } from "valtio/react"
+import clsx from "clsx"
+import { Tooltip } from "@nextui-org/tooltip"
+import { useIsSSR } from "@react-aria/ssr"
+import { Divider } from "@nextui-org/divider"
 
-import { dispatchGraphPrefProxy } from '@/components/state/pref-state'
-import { PprofType } from '@/components/hooks/use-graph-data'
+import { dispatchGraphPrefProxy, graphPrefsState } from "@/components/state/pref-state"
+import { PprofType } from "@/components/hooks/use-graph-data"
+import prettyTime from "@/components/util/prettyTime"
+import { round } from "lodash"
+import { useProfileDuration } from "@/components/hooks/use-profile-duration"
 
 export type ChartPrefProps = {
   pprofType: PprofType
@@ -22,15 +25,15 @@ type topNOpt = {
 }
 
 const topNOptions: topNOpt[] = [
-  { key: '5', num: 5 },
-  { key: '10', num: 10 },
-  { key: '20', num: 20 },
+  { key: "5", num: 5 },
+  { key: "10", num: 10 },
+  { key: "20", num: 20 },
   {
-    key: '50',
-    num: 50,
+    key: "50",
+    num: 50
   },
-  { key: '100', num: 100 },
-  { key: '999', num: 999 },
+  { key: "100", num: 100 },
+  { key: "999", num: 999 }
 ]
 
 export const ChartOption: React.FC<ChartPrefProps> = ({ pprofType, className }) => {
@@ -48,30 +51,30 @@ export const ChartOption: React.FC<ChartPrefProps> = ({ pprofType, className }) 
   }
 
   return (
-    <div className={clsx('flex gap-3 items-center', className)}>
+    <div className={clsx("flex gap-3 items-center", className)}>
       <Checkbox className="" isSelected={total} size="sm" value="Total" onValueChange={setTotal}>
         Total
       </Checkbox>
-      <Divider className="h-4 bg-default-300" orientation={'vertical'} />
+      <Divider className="h-4 bg-default-300" orientation={"vertical"} />
       <Tooltip
         className="bg-default-200"
         closeDelay={0}
         content={`Keep only the top N values at any time`}
         delay={500}
-        placement={'right-start'}
+        placement={"right-start"}
       >
         <Select
           className="w-28 items-center"
           classNames={{
-            trigger: 'min-h-0 h-6',
+            trigger: "min-h-0 h-6"
           }}
           defaultSelectedKeys={[`20`]}
           items={topNOptions}
           label={<p className="text-nowrap text-sm font-light text-foreground">Top</p>}
-          labelPlacement={'outside-left'}
+          labelPlacement={"outside-left"}
           selectedKeys={[`${topN}`]}
           selectionMode="single"
-          size={'sm'}
+          size={"sm"}
           onSelectionChange={keys => {
             if (keys.anchorKey) {
               if (!isNaN(Number(keys.anchorKey))) {
@@ -87,6 +90,19 @@ export const ChartOption: React.FC<ChartPrefProps> = ({ pprofType, className }) 
           )}
         </Select>
       </Tooltip>
+      {pprofType === "CPU" && <Divider className="h-4 bg-default-300" orientation={"vertical"} />}
+      {pprofType === "CPU" && <ProfileDuration />}
+    </div>
+  )
+}
+
+const ProfileDuration: React.FC = () => {
+  const { seconds } = useProfileDuration()
+
+  return (
+    <div className="flex gap-1">
+      <p className="text-sm font-light text-foreground">Profile Duration:</p>
+      <p className="text-sm text-foreground">{prettyTime(seconds * 1000, { short: true })}</p>
     </div>
   )
 }

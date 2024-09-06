@@ -1,6 +1,6 @@
 // noinspection ES6ConvertVarToLetConst,JSUnresolvedReference
 
-'use strict'
+"use strict"
 
 var map = {
   year: 31536000000,
@@ -9,29 +9,29 @@ var map = {
   hour: 3600000,
   minute: 60000,
   second: 1000,
-  ms: 1,
+  ms: 1
 }
 
 var short = {
-  year: 'y',
-  month: 'mo',
-  day: 'd',
-  hour: 'h',
-  minute: 'm',
-  second: 's',
-  ms: 'ms',
+  year: "y",
+  month: "mo",
+  day: "d",
+  hour: "h",
+  minute: "m",
+  second: "s",
+  ms: "ms"
 }
 
 export default function prettyTime(value, options) {
   options = options || {}
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     value = parseInt(value, 10)
     if (isNaN(value)) {
-      throw new Error('Invalid value: ' + value)
+      throw new Error("Invalid value: " + value)
     }
-  } else if (typeof value !== 'number') {
-    throw new Error('Invalid value: ' + value)
+  } else if (typeof value !== "number") {
+    throw new Error("Invalid value: " + value)
   }
 
   value = Math.abs(value)
@@ -46,15 +46,15 @@ export default function prettyTime(value, options) {
     }
   })
 
-  if (typeof options.decimals === 'number') {
+  if (typeof options.decimals === "number") {
     value = Number(value.toFixed(options.decimals))
   }
 
   if (options.short) {
     unit = short[unit]
-  } else if (value > 1 && unit !== 'ms') {
-    unit += 's'
+  } else if (value > 1 && unit !== "ms") {
+    unit += "s"
   }
 
-  return [value, unit].join(' ')
+  return [value, unit].join(" ")
 }

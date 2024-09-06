@@ -43,7 +43,7 @@ func (m *MockMetricsServer) GoroutineMetrics(_ context.Context, req *api.GoMetri
 }
 
 func (m *MockMetricsServer) dispatch(req *api.GoMetricsRequest, mt MetricsType) (*api.GoMetricsResponse, error) {
-	_, err := MetricsURL(req.Url, mt, false)
+	_, err := MetricsURL(false, mt, req.Url, req.ProfileSeconds)
 	if err != nil {
 		return nil, err
 	}
