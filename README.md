@@ -7,7 +7,7 @@ Use `live-pprof` to Monitor a Go app's performance. It launches in just 1 second
 ## Install
 
 ```bash
-go install github.com/moderato-app/live-pprof
+go install github.com/moderato-app/live-pprof@v1
 ```
 
 ## Usage
