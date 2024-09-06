@@ -1,6 +1,7 @@
 name: Unit testing and E2E testing
 
 on:
+  workflow_call:
   push:
     branches: [ "main" ]
     paths:
