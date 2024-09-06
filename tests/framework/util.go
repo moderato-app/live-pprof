@@ -46,7 +46,7 @@ func FindBinary(t *testing.T) (string, error) {
 }
 
 func IsRunning(s cmd.Status) bool {
-	return s.Error == nil && s.StartTs > 0 && !s.Complete && s.Exit == 0
+	return s.Error == nil && s.StartTs > 0 && !s.Complete && s.Exit == -1
 }
 
 func LogContainsText(s cmd.Status, text string) bool {
@@ -75,17 +75,30 @@ func WhatsWrong(s cmd.Status) error {
 	return errors.New("debug info: " + string(marshal))
 }
 
-func WaitForRunningOrFail(t *testing.T, c *cmd.Cmd) {
-	timer := time.NewTimer(3 * time.Second)
-	ticker := time.NewTimer(100 * time.Millisecond)
+// WaitForRunningOrFail checks if stdout or stderr has content when mustWaitForStdOutput is true.
+// mustWaitForStdOutput is useful when the OS performs security checks on the binary, which can be
+// terribly slow on macOS.
+func WaitForRunningOrFail(t *testing.T, c *cmd.Cmd, mustWaitForStdOutput bool) {
+	timer := time.NewTimer(100 * time.Second)
+	ticker := time.NewTicker(100 * time.Millisecond)
+	defer timer.Stop()
+	defer ticker.Stop()
 
-	select {
-	case <-timer.C:
-		t.Fatalf("failed to start: %v", WhatsWrong(c.Status()))
-	case <-ticker.C:
-		status := c.Status()
-		if IsRunning(status) {
-			break
+	for {
+		select {
+		case <-timer.C:
+			t.Fatalf("failed to start: %v", WhatsWrong(c.Status()))
+		case <-ticker.C:
+			status := c.Status()
+			if IsRunning(status) {
+				if mustWaitForStdOutput {
+					if len(status.Stdout) > 0 || len(status.Stderr) > 0 {
+						return
+					}
+				} else {
+					return
+				}
+			}
 		}
 	}
 

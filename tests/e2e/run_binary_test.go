@@ -27,7 +27,7 @@ func TestRunBinary(t *testing.T) {
 	c.Start()
 	defer c.Stop()
 
-	WaitForRunningOrFail(t, c)
+	WaitForRunningOrFail(t, c, true)
 
 	assert.True(t, LogContainsText(c.Status(), "listening on localhost:12345") ||
 		LogContainsText(c.Status(), "listening on 127.0.0.1:12345"), WhatsWrong(c.Status()))
