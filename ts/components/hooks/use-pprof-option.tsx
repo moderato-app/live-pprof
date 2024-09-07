@@ -126,16 +126,21 @@ const tooltipFormatter = (foc: FlatOrCum, labelFmt: (value: number) => string): 
       const value = p.value[foc.toLowerCase()]
       const splits = p.seriesName.split(" ")
       const func = splits[0]
+      const line = splits[1]
       if (value) {
         output += `<div class="flex flex-col gap-0.5">
-              <div class="flex flex-col">
-                <div class="flex items-center justify-between gap-8">
-                  <div class="flex gap-0.5">
+              <div class="flex flex-col items-start">
+                <div class="flex items-center justify-between gap-8 w-full">
+                  <div class="flex gap-0.5 w-full">
                     <div class="translate-y-0.5">${p.marker}</div>
                     <span class="text-default-600 text-center">${func}</span>
                   </div>
   
                   <div class="font-bold text-default-600">${labelFmt(value)}</div>
+                </div>
+                <div class="flex gap-0.5 justify-start mr-12">
+                    <div class="opacity-0">${p.marker}</div>
+                    <p class="text-default-500 font-light text-sm text-center">${line}</p>
                 </div>
               </div">              
             </div>`

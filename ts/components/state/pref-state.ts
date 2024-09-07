@@ -21,7 +21,7 @@ const newGraphPref = (): GraphPref => ({
   total: false,
   flatOrCum: FlatOrCum.flat,
   enabled: true,
-  topN: 20
+  topN: 10
 })
 
 export type GraphPrefs = {
