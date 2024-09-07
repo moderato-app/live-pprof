@@ -34,7 +34,7 @@ func (m *GeneralServer) DetectURL(req *api.DetectURLRequest, stream api.General_
 	urls := make([]string, 0, 5)
 	urls = append(urls, req.Url)
 	for _, mt := range mts {
-		url, err := metrics.MetricsURL(false, mt, req.Url, 1)
+		url, err := metrics.MetricsURL(true, mt, req.Url, 1)
 		if err != nil {
 			logging.Sugar.Error(err)
 			panic(err)
