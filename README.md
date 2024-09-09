@@ -1,3 +1,9 @@
+You don’t want to clutter up your computer with Docker, Prometheus, Grafana or even K8S just to monitor a Go app's heap size, right?
+
+Use `live-pprof` to Monitor a Go app's performance. It launches in seconds, boosting your local development.
+
+<img width="1920" alt="Xnip2024-09-10_04-58-57" src="https://github.com/user-attachments/assets/be6fa249-eb7d-4ce9-8db9-8bd8c7c657b1">
+
 https://github.com/user-attachments/assets/77bfacd8-1779-4aaf-9758-9604362a1eb5
 
 <details>
@@ -12,9 +18,6 @@ https://github.com/user-attachments/assets/77bfacd8-1779-4aaf-9758-9604362a1eb5
 </details>
 
 
-You don’t want to clutter up your computer with Docker, Prometheus, Grafana or even K8S just to monitor a Go app's heap size, right?
-
-Use `live-pprof` to Monitor a Go app's performance. It launches in 1 second, boosting your local development.
 
 ## Install
 
