@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -25,6 +24,7 @@ func StartServeGrpc(gs *grpc.Server, conf *config.LivePprofConfig) {
 	if err != nil {
 		logging.Sugar.Fatal(err)
 	}
+	conf.Port = port
 
 	logging.Sugar.Infof("listening on %s", l.Addr().String())
 	addr := fmt.Sprintf("%s:%d", strings.Replace(conf.Host, "0.0.0.0", "localhost", 1), port)
@@ -59,7 +59,7 @@ func StartServeGrpc(gs *grpc.Server, conf *config.LivePprofConfig) {
 func findPort(port uint, host string) (net.Listener, uint, error) {
 	for {
 		if port > 65535 || port == 0 {
-			return nil, 0, errors.New("port out of range [1, 65535]")
+			return nil, 0, fmt.Errorf("port %d is out of range [1, 65535]", port)
 		}
 		addr := fmt.Sprintf("%s:%d", host, port)
 		l, err := net.Listen("tcp", addr)
