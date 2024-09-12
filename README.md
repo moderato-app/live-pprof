@@ -18,7 +18,6 @@ https://github.com/user-attachments/assets/77bfacd8-1779-4aaf-9758-9604362a1eb5
 </details>
 
 
-
 ## Install
 
 ```bash
@@ -51,3 +50,9 @@ live-pprof 6060
 live-pprof http://localhost:6060/debug/pprof
 # Both commands will monitor http://localhost:6060/debug/pprof
 ```
+
+## Limitations
+* Metrics data is stored in the browser memory and is cleared on page refresh.
+* The page slows down as data grows due to charts rendering.
+
+As you can see, live-pprof is mainly for local development. These limitations mean it’s not a replacement for Prometheus and Grafana.
