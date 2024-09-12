@@ -56,3 +56,10 @@ live-pprof http://localhost:6060/debug/pprof
 * The page slows down as data grows due to charts rendering.
 
 As you can see, live-pprof is mainly for local development. These limitations mean it’s not a replacement for Prometheus and Grafana.
+
+## Credits
+<a href="https://golangweekly.com/latest" target="_blank">
+  <img width="200" alt="image" src="https://github.com/user-attachments/assets/25490d69-576c-4d47-9f3a-6b8a1200e57b">
+</a>
+
+Thanks to [Golang Weekly](https://golangweekly.com/latest) for the shoutout!
