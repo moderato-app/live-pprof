@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -74,6 +75,9 @@ func fetch(ctx context.Context, url string) (*moderato.Metrics, error) {
 	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read all body: %w", err)
+	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		logging.Sugar.Error("resp.Body: \n" + string(data))

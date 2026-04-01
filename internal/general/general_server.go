@@ -2,6 +2,7 @@ package general
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -90,6 +91,9 @@ func detect(ctx context.Context, url string) (*api.HTTPResult, error) {
 	defer func() { _ = resp.Body.Close() }()
 
 	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read all body: %w", err)
+	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 399 {
 		logging.Sugar.Info("resp.Body: \n" + string(data))
